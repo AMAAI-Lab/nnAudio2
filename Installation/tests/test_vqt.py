@@ -10,7 +10,7 @@ import os
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-from nnAudio.features import CQT2010v2, VQT, CQT1992v2
+from nnAudio2.features import CQT2010v2, VQT, CQT1992v2
 import numpy as np
 from parameters import *
 import warnings
