@@ -10,7 +10,7 @@ import os
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-from nnAudio.Spectrogram import *
+from nnAudio2.Spectrogram import *
 from parameters import *
 import warnings
 
