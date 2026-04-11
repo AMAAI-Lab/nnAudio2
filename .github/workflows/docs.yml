@@ -1,0 +1,35 @@
+name: Build and deploy docs
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install sphinx
+          pip install -e "Installation[tests]"
+
+      - name: Build docs
+        working-directory: Sphinx  
+        run: sphinx-build source _build/html
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: Sphinx/_build/html
