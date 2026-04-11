@@ -1,4 +1,4 @@
-.. automodule:: nnAudio
+.. automodule:: nnAudio2
 
 .. autosummary::
    :toctree: _autosummary
