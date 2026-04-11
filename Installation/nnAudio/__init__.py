@@ -1,7 +1,7 @@
 import os
 import warnings
 
-__version__ = "0.3.4"
+__version__ = "2.0.0"
 
 __citation__ = (
     'K. W. Cheuk, H. Anderson, K. Agres and D. Herremans, "nnAudio: '
