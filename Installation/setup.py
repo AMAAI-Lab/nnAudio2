@@ -39,7 +39,7 @@ def get_metadata(rel_path):
     return namespace
 
 
-PACKAGE_METADATA = get_metadata("nnAudio/__init__.py")
+PACKAGE_METADATA = get_metadata("nnAudio2/__init__.py")
 _CITATION_REMINDER = PACKAGE_METADATA["_CITATION_REMINDER"]
 
 
@@ -79,18 +79,18 @@ if bdist_wheel is not None:
 
 
 setuptools.setup(
-    name="nnaudio",  # Replace with your own username
+    name="nnaudio2",  # Replace with your own username
     version=PACKAGE_METADATA["__version__"],
     author="KinWaiCheuk",
     author_email="u3500684@connect.hku.hk",
     description="A fast GPU audio processing toolbox with 1D convolutional neural network",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/AMAAI-Lab/nnAudio",
+    url="https://github.com/AMAAI-Lab/nnAudio2",
     project_urls={
         "Documentation": "https://kinwaicheuk.github.io/nnAudio/index.html",
-        "Issues": "https://github.com/AMAAI-Lab/nnAudio/issues",
-        "Source": "https://github.com/AMAAI-Lab/nnAudio",
+        "Issues": "https://github.com/AMAAI-Lab/nnAudio2/issues",
+        "Source": "https://github.com/AMAAI-Lab/nnAudio2",
     },
     packages=setuptools.find_packages(),
     classifiers=[
