@@ -25,8 +25,7 @@ jobs:
           pip install -e "Installation[tests]"
 
       - name: Build docs
-        working-directory: Sphinx  
-        run: sphinx-build source _build/html
+        run: sphinx-build Sphinx/source Sphinx/_build/html
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4
