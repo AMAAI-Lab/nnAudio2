@@ -17,7 +17,7 @@ import codecs
 import sys
 import sphinx_rtd_theme  # This is for a nice html theme
 
-sys.path.insert(0, "../Installation/nnAudio")
+sys.path.insert(0, "../Installation/nnAudio2")
 sys.path.insert(0, "../Installation/")
 
 
@@ -163,7 +163,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, "nnAudio.tex", "nnAudio Documentation", "Cheuk Kin Wai", "manual"),
+    (master_doc, "nnAudio2.tex", "nnAudio2 Documentation", "AMAAI Lab", "manual"),
 ]
 
 
@@ -171,7 +171,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "nnaudio", "nnAudio Documentation", [author], 1)]
+man_pages = [(master_doc, "nnaudio2", "nnAudio2 Documentation", [author], 1)]
 
 
 # -- Options for Texinfo output ----------------------------------------------
@@ -182,10 +182,10 @@ man_pages = [(master_doc, "nnaudio", "nnAudio Documentation", [author], 1)]
 texinfo_documents = [
     (
         master_doc,
-        "nnAudio",
-        "nnAudio Documentation",
+        "nnAudio2",
+        "nnAudio2 Documentation",
         author,
-        "nnAudio",
+        "nnAudio2",
         "One line description of project.",
         "Miscellaneous",
     ),
