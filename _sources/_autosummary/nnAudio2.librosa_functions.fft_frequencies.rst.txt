@@ -1,0 +1,6 @@
+nnAudio2.librosa\_functions.fft\_frequencies
+============================================
+
+.. currentmodule:: nnAudio2.librosa_functions
+
+.. autofunction:: fft_frequencies

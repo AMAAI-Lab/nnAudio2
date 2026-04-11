@@ -1,0 +1,32 @@
+nnAudio2.features.gammatone
+===========================
+
+.. automodule:: nnAudio2.features.gammatone
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+      :template: custom-class-template.rst
+      :nosignatures:
+   
+      Gammatonegram
+   
+   
+
+   
+   
+   
+
+
+

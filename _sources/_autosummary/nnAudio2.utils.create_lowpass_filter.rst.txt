@@ -1,0 +1,6 @@
+nnAudio2.utils.create\_lowpass\_filter
+======================================
+
+.. currentmodule:: nnAudio2.utils
+
+.. autofunction:: create_lowpass_filter

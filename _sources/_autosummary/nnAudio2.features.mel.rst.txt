@@ -1,0 +1,33 @@
+nnAudio2.features.mel
+=====================
+
+.. automodule:: nnAudio2.features.mel
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+      :template: custom-class-template.rst
+      :nosignatures:
+   
+      MFCC
+      MelSpectrogram
+   
+   
+
+   
+   
+   
+
+
+

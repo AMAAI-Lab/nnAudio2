@@ -1,0 +1,32 @@
+nnAudio2.features.vqt
+=====================
+
+.. automodule:: nnAudio2.features.vqt
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+      :template: custom-class-template.rst
+      :nosignatures:
+   
+      VQT
+   
+   
+
+   
+   
+   
+
+
+

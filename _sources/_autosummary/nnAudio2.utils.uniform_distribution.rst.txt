@@ -1,0 +1,6 @@
+nnAudio2.utils.uniform\_distribution
+====================================
+
+.. currentmodule:: nnAudio2.utils
+
+.. autofunction:: uniform_distribution

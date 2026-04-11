@@ -1,0 +1,6 @@
+nnAudio2.utils.create\_fourier\_kernels
+=======================================
+
+.. currentmodule:: nnAudio2.utils
+
+.. autofunction:: create_fourier_kernels

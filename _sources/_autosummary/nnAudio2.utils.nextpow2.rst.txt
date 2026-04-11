@@ -1,0 +1,6 @@
+nnAudio2.utils.nextpow2
+=======================
+
+.. currentmodule:: nnAudio2.utils
+
+.. autofunction:: nextpow2

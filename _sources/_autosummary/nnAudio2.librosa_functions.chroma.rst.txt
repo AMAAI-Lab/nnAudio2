@@ -1,0 +1,6 @@
+nnAudio2.librosa\_functions.chroma
+==================================
+
+.. currentmodule:: nnAudio2.librosa_functions
+
+.. autofunction:: chroma

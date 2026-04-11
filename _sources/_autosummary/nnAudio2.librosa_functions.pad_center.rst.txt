@@ -1,0 +1,6 @@
+nnAudio2.librosa\_functions.pad\_center
+=======================================
+
+.. currentmodule:: nnAudio2.librosa_functions
+
+.. autofunction:: pad_center

@@ -1,0 +1,6 @@
+nnAudio2.utils.torch\_window\_sumsquare
+=======================================
+
+.. currentmodule:: nnAudio2.utils
+
+.. autofunction:: torch_window_sumsquare

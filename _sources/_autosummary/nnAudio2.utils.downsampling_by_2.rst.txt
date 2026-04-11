@@ -1,0 +1,6 @@
+nnAudio2.utils.downsampling\_by\_2
+==================================
+
+.. currentmodule:: nnAudio2.utils
+
+.. autofunction:: downsampling_by_2

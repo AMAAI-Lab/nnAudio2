@@ -1,0 +1,6 @@
+nnAudio2.librosa\_functions.get\_gammatone
+==========================================
+
+.. currentmodule:: nnAudio2.librosa_functions
+
+.. autofunction:: get_gammatone

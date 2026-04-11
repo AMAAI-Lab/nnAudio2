@@ -1,0 +1,6 @@
+nnAudio2.utils.broadcast\_dim
+=============================
+
+.. currentmodule:: nnAudio2.utils
+
+.. autofunction:: broadcast_dim

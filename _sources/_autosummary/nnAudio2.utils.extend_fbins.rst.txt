@@ -1,0 +1,6 @@
+nnAudio2.utils.extend\_fbins
+============================
+
+.. currentmodule:: nnAudio2.utils
+
+.. autofunction:: extend_fbins

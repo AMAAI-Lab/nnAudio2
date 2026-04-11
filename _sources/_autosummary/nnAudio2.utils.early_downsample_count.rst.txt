@@ -1,0 +1,6 @@
+nnAudio2.utils.early\_downsample\_count
+=======================================
+
+.. currentmodule:: nnAudio2.utils
+
+.. autofunction:: early_downsample_count

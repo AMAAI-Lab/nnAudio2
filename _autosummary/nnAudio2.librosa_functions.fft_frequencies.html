@@ -1,0 +1,177 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nnAudio2.librosa_functions.fft_frequencies &mdash; 2.0.0</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=51b770b3"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="nnAudio2.librosa_functions.get_gammatone" href="nnAudio2.librosa_functions.get_gammatone.html" />
+    <link rel="prev" title="nnAudio2.librosa_functions.fft2gammatonemx" href="nnAudio2.librosa_functions.fft2gammatonemx.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            nnAudio2
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro.html#usage">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro.html#speed">Speed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro.html#trainable-kernals">Trainable kernals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro.html#different-cqt-versions">Different CQT versions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="nnAudio2.features.html">nnAudio2.features</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="nnAudio2.librosa_functions.html">nnAudio2.librosa_functions</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nnAudio2.librosa_functions.chroma.html">nnAudio2.librosa_functions.chroma</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nnAudio2.librosa_functions.fft2gammatonemx.html">nnAudio2.librosa_functions.fft2gammatonemx</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">nnAudio2.librosa_functions.fft_frequencies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nnAudio2.librosa_functions.fft_frequencies"><code class="docutils literal notranslate"><span class="pre">fft_frequencies()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nnAudio2.librosa_functions.get_gammatone.html">nnAudio2.librosa_functions.get_gammatone</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nnAudio2.librosa_functions.get_mel.html">nnAudio2.librosa_functions.get_mel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nnAudio2.librosa_functions.hz_to_mel.html">nnAudio2.librosa_functions.hz_to_mel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nnAudio2.librosa_functions.hz_to_octs.html">nnAudio2.librosa_functions.hz_to_octs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nnAudio2.librosa_functions.mel_frequencies.html">nnAudio2.librosa_functions.mel_frequencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nnAudio2.librosa_functions.mel_to_hz.html">nnAudio2.librosa_functions.mel_to_hz</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nnAudio2.librosa_functions.normalize.html">nnAudio2.librosa_functions.normalize</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nnAudio2.librosa_functions.pad_center.html">nnAudio2.librosa_functions.pad_center</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nnAudio2.librosa_functions.tiny.html">nnAudio2.librosa_functions.tiny</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="nnAudio2.utils.html">nnAudio2.utils</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">PyTorch Template for Audio projects</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">GitHub</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../github.html">Source Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../github.html#call-for-contribution">Call for Contribution</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Citation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../citing.html">Citing nnAudio</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">nnAudio2</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../nnAudio2.html">&lt;no title&gt;</a></li>
+          <li class="breadcrumb-item"><a href="nnAudio2.librosa_functions.html">nnAudio2.librosa_functions</a></li>
+      <li class="breadcrumb-item active">nnAudio2.librosa_functions.fft_frequencies</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_autosummary/nnAudio2.librosa_functions.fft_frequencies.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="nnaudio2-librosa-functions-fft-frequencies">
+<h1>nnAudio2.librosa_functions.fft_frequencies<a class="headerlink" href="#nnaudio2-librosa-functions-fft-frequencies" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="nnAudio2.librosa_functions.fft_frequencies">
+<span class="sig-prename descclassname"><span class="pre">nnAudio2.librosa_functions.</span></span><span class="sig-name descname"><span class="pre">fft_frequencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">22050</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_fft</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2048</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#nnAudio2.librosa_functions.fft_frequencies" title="Link to this definition"></a></dt>
+<dd><p>Alternative implementation of <cite>np.fft.fftfreq</cite>
+:param sr: Audio sampling rate
+:type sr: number &gt; 0 [scalar]
+:param n_fft: FFT window size
+:type n_fft: int &gt; 0 [scalar]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>freqs</strong> – Frequencies <cite>(0, sr/n_fft, 2*sr/n_fft, …, sr/2)</cite></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray [shape=(1 + n_fft/2,)]</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">librosa</span><span class="o">.</span><span class="n">fft_frequencies</span><span class="p">(</span><span class="n">sr</span><span class="o">=</span><span class="mi">22050</span><span class="p">,</span> <span class="n">n_fft</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="go">array([     0.   ,   1378.125,   2756.25 ,   4134.375,</span>
+<span class="go">         5512.5  ,   6890.625,   8268.75 ,   9646.875,  11025.   ])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="nnAudio2.librosa_functions.fft2gammatonemx.html" class="btn btn-neutral float-left" title="nnAudio2.librosa_functions.fft2gammatonemx" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="nnAudio2.librosa_functions.get_gammatone.html" class="btn btn-neutral float-right" title="nnAudio2.librosa_functions.get_gammatone" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, AMAAI Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

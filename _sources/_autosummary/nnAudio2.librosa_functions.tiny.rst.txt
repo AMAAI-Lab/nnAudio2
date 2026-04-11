@@ -1,0 +1,6 @@
+nnAudio2.librosa\_functions.tiny
+================================
+
+.. currentmodule:: nnAudio2.librosa_functions
+
+.. autofunction:: tiny

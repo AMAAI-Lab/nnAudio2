@@ -1,0 +1,6 @@
+nnAudio2.librosa\_functions.mel\_to\_hz
+=======================================
+
+.. currentmodule:: nnAudio2.librosa_functions
+
+.. autofunction:: mel_to_hz

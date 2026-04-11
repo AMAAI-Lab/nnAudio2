@@ -1,0 +1,6 @@
+nnAudio2.utils.early\_downsample
+================================
+
+.. currentmodule:: nnAudio2.utils
+
+.. autofunction:: early_downsample

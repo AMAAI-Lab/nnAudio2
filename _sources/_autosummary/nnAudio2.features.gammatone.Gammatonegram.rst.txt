@@ -1,0 +1,23 @@
+nnAudio2.features.gammatone.Gammatonegram
+=========================================
+
+.. currentmodule:: nnAudio2.features.gammatone
+
+.. autoclass:: Gammatonegram
+   :members:
+   :show-inheritance:
+   :no-inherited-members:
+   :special-members: __call__, __add__, __mul__
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :nosignatures:
+   
+      ~Gammatonegram.__init__
+      ~Gammatonegram.extra_repr
+      ~Gammatonegram.forward
+   
+   

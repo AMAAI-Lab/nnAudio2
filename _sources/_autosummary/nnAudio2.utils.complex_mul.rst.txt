@@ -1,0 +1,6 @@
+nnAudio2.utils.complex\_mul
+===========================
+
+.. currentmodule:: nnAudio2.utils
+
+.. autofunction:: complex_mul

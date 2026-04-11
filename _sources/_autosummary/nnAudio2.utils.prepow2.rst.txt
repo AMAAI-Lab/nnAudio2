@@ -1,0 +1,6 @@
+nnAudio2.utils.prepow2
+======================
+
+.. currentmodule:: nnAudio2.utils
+
+.. autofunction:: prepow2

@@ -1,0 +1,6 @@
+nnAudio2.utils.get\_window\_dispatch
+====================================
+
+.. currentmodule:: nnAudio2.utils
+
+.. autofunction:: get_window_dispatch

@@ -1,0 +1,6 @@
+nnAudio2.utils.get\_cqt\_complex
+================================
+
+.. currentmodule:: nnAudio2.utils
+
+.. autofunction:: get_cqt_complex

@@ -1,0 +1,6 @@
+nnAudio2.librosa\_functions.fft2gammatonemx
+===========================================
+
+.. currentmodule:: nnAudio2.librosa_functions
+
+.. autofunction:: fft2gammatonemx

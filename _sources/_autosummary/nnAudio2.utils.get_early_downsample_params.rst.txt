@@ -1,0 +1,6 @@
+nnAudio2.utils.get\_early\_downsample\_params
+=============================================
+
+.. currentmodule:: nnAudio2.utils
+
+.. autofunction:: get_early_downsample_params
