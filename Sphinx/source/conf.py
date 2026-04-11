@@ -37,12 +37,12 @@ def get_version(rel_path):
 
 # -- Project information -----------------------------------------------------
 
-project = "nnAudio"
-copyright = "2019, Cheuk Kin Wai"
-author = "Cheuk Kin Wai"
+project = "nnAudio2"
+copyright = "2026, AMAAI Lab"
+author = "AMAAI Lab"
 
 # The short X.Y version
-version = get_version("../../Installation/nnAudio/__init__.py")
+version = get_version("../../Installation/nnAudio2/__init__.py")
 # The full version, including alpha/beta/rc tags
 release = f"{version}"
 
