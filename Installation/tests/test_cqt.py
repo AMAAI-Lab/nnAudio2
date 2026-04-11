@@ -110,7 +110,7 @@ def test_cqt_1992_v2_log(device):
         os.path.join(dir_path, "ground-truths/log-sweep-cqt-1992-mag-ground-truth.npy")
     )
     X = torch.log(X + 1e-5)
-    assert np.allclose(X.cpu(), ground_truth, rtol=1e-3, atol=1e-3)
+    assert np.allclose(X.cpu().numpy(), ground_truth.astype(np.float32), rtol=1e-3, atol=1e-3)
 
     # Complex
     stft = CQT1992v2(
@@ -134,7 +134,7 @@ def test_cqt_1992_v2_log(device):
             dir_path, "ground-truths/log-sweep-cqt-1992-phase-ground-truth.npy"
         )
     )
-    assert np.allclose(X.cpu(), ground_truth, rtol=1e-3, atol=1e-3)
+    assert np.allclose(X.cpu().numpy(), ground_truth.astype(np.float32), rtol=1e-3, atol=1e-3)
 
 
 @pytest.mark.parametrize("device", [*device_args])
@@ -159,7 +159,7 @@ def test_cqt_1992_v2_linear(device):
         )
     )
     X = torch.log(X + 1e-5)
-    assert np.allclose(X.cpu(), ground_truth, rtol=1e-3, atol=1e-3)
+    assert np.allclose(X.cpu().numpy(), ground_truth.astype(np.float32), rtol=1e-3, atol=1e-3)
 
     # Complex
     stft = CQT1992v2(
@@ -171,7 +171,7 @@ def test_cqt_1992_v2_linear(device):
             dir_path, "ground-truths/linear-sweep-cqt-1992-complex-ground-truth.npy"
         )
     )
-    assert np.allclose(X.cpu(), ground_truth, rtol=1e-3, atol=1e-3)
+    assert np.allclose(X.cpu().numpy(), ground_truth.astype(np.float32), rtol=1e-3, atol=1e-3)
 
     # Phase
     stft = CQT1992v2(
@@ -183,7 +183,7 @@ def test_cqt_1992_v2_linear(device):
             dir_path, "ground-truths/linear-sweep-cqt-1992-phase-ground-truth.npy"
         )
     )
-    assert np.allclose(X.cpu(), ground_truth, rtol=1e-3, atol=1e-3)
+    assert np.allclose(X.cpu().numpy(), ground_truth.astype(np.float32), rtol=1e-3, atol=1e-3)
 
 
 @pytest.mark.parametrize("device", [*device_args])
@@ -207,7 +207,7 @@ def test_cqt_2010_v2_log(device):
     ground_truth = np.load(
         os.path.join(dir_path, "ground-truths/log-sweep-cqt-2010-mag-ground-truth.npy")
     )
-    assert np.allclose(X.cpu(), ground_truth, rtol=1e-3, atol=1e-3)
+    assert np.allclose(X.cpu().numpy(), ground_truth.astype(np.float32), rtol=1e-3, atol=1e-3)
 
     # Complex
     stft = CQT2010v2(
@@ -246,7 +246,7 @@ def test_cqt_2010_v2_linear(device):
             dir_path, "ground-truths/linear-sweep-cqt-2010-mag-ground-truth.npy"
         )
     )
-    assert np.allclose(X.cpu(), ground_truth, rtol=1e-3, atol=1e-3)
+    assert np.allclose(X.cpu().numpy(), ground_truth.astype(np.float32), rtol=1e-3, atol=1e-3)
 
     # Complex
     stft = CQT2010v2(
