@@ -1,17 +1,17 @@
-.. nnAudio documentation master file, created by
+.. nnAudio2 documentation master file, created by
    sphinx-quickstart on Tue Dec  3 10:57:48 2019.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-nnAudio |ProjectVersion|
+nnAudio2 |ProjectVersion|
 ===================================
-Welcome to nnAudio |ProjectVersion|. A big shout out to `Miguel Pérez <https://github.com/migperfer>`_ who made this new update possible. Please feel free to check out his `github repositories <https://github.com/migperfer>`_ too.
+Welcome to nnAudio2 |ProjectVersion|. A big shout out to `Miguel Pérez <https://github.com/migperfer>`_ who made this new update possible. Please feel free to check out his `github repositories <https://github.com/migperfer>`_ too.
 
-This new version restructured the coding style, making things more modular and pythonic. In terms of functionalities, everything remains the same. In the future releases, ``nnAudio.Spectrogram`` will be replaced by ``nnAudio.features`` (see also :func:`~nnAudio.features`.)
+This new version restructured the coding style, making things more modular and pythonic. In terms of functionalities, everything remains the same. In the future releases, ``nnAudio2.Spectrogram`` will be replaced by ``nnAudio.features`` (see also :func:`~nnAudio.features`.)
 
-:func:`~nnAudio.features.vqt.VQT` is finally avaliable in version |ProjectVersion| thanks to `Hao Hao Tan <https://github.com/gudgud96>`_!
+:func:`~nnAudio2.features.vqt.VQT` is finally avaliable in version |ProjectVersion| thanks to `Hao Hao Tan <https://github.com/gudgud96>`_!
 
-Reminder: if you use nnAudio, please cite `The paper <https://ieeexplore.ieee.org/abstract/document/9174990>`_ describing its release.
+Reminder: if you use nnAudio2, please cite `The paper <https://ieeexplore.ieee.org/abstract/document/9174990>`_ describing its release.
 
 
 Quick Start
@@ -19,7 +19,7 @@ Quick Start
 .. code-block:: python
     :emphasize-lines: 1,8-10,12
 
-    from nnAudio import features
+    from nnAudio2 import features
     from scipy.io import wavfile
     import torch
     sr, song = wavfile.read('./Bach.wav') # Loading your audio
@@ -34,7 +34,7 @@ Quick Start
 
 For inverse STFT, use the standard uniform-bin configuration with ``freq_scale='no'``. The non-uniform ``linear``, ``log``, and ``log2`` frequency scales should be treated as analysis-only.
 
-nnAudio is an audio processing toolbox using PyTorch convolutional neural
+nnAudio2 is an audio processing toolbox using PyTorch convolutional neural
 network as its backend. By doing so, spectrograms can be generated from
 audio on-the-fly during neural network training and the Fourier kernels
 (e.g. or CQT kernels) can be trained.
@@ -48,14 +48,14 @@ Other GPU audio processing tools are
 But they are not using the neural network approach, and hence the
 Fourier basis can not be trained. As of PyTorch 1.6.0, torchaudio is
 still very difficult to install under the Windows environment due to
-``sox``. nnAudio is a more compatible audio processing tool across
+``sox``. nnAudio2 is a more compatible audio processing tool across
 different operating systems since it relies mostly on PyTorch
-convolutional neural network. The name of nnAudio comes from
+convolutional neural network. The name of nnAudio2 comes from
 ``torch.nn``.
 
-The implementation details for **nnAudio** have also been published in IEEE Access, people who are interested can read the `paper <https://ieeexplore.ieee.org/document/9174990>`__.
+The implementation details for **nnAudio2** have also been published in IEEE Access, people who are interested can read the `paper <https://ieeexplore.ieee.org/document/9174990>`__.
 
-The source code for **nnAudio** can be found in `GitHub <https://github.com/AMAAI-Lab/nnAudio>`__.
+The source code for **nnAudio2** can be found in `GitHub <https://github.com/AMAAI-Lab/nnAudio2>`__.
 
 
 .. toctree::
@@ -69,7 +69,7 @@ The source code for **nnAudio** can be found in `GitHub <https://github.com/AMAA
     :maxdepth: 1
     :caption: API Documentation
     
-    nnAudio
+    nnAudio2
  
 
 .. toctree::
