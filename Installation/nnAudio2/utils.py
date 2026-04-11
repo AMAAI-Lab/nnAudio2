@@ -14,7 +14,7 @@ from scipy import signal
 from scipy.fftpack import fft
 import warnings
 
-from nnAudio.librosa_functions import *
+from nnAudio2.librosa_functions import *
 
 sz_float = 4  # size of a float
 epsilon = 1e-8  # fudge factor for normalization
