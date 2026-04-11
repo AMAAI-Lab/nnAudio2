@@ -26,10 +26,10 @@ jobs:
           package_version="$(python - <<'PY'
           import pathlib
           import re
-          text = pathlib.Path("nnAudio/__init__.py").read_text()
+          text = pathlib.Path("nnAudio2/__init__.py").read_text()
           match = re.search(r'__version__\s*=\s*"([^"]+)"', text)
           if match is None:
-              raise SystemExit("Could not find __version__ in nnAudio/__init__.py")
+              raise SystemExit("Could not find __version__ in nnAudio2/__init__.py")
           print(match.group(1))
           PY
           )"
@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/nnaudio
+      url: https://pypi.org/p/nnaudio2
     permissions:
       id-token: write
     steps:
