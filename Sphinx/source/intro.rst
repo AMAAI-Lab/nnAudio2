@@ -2,7 +2,7 @@
 Introduction
 ************
 
-nnAudio is basically a GPU version of some of the librosa functions, with additional features such as differentiable and trainable. The figure below shows the spectrograms obtained by nnAudio and librosa using different input signals.
+nnAudio2 is basically a GPU version of some of the librosa functions, with additional features such as differentiable and trainable. The figure below shows the spectrograms obtained by nnAudio2 and librosa using different input signals.
 
 .. image:: ../../figures/performance_1.png
     :align: center
@@ -23,11 +23,11 @@ The lastest version might not be always available in PyPI, in this case, please 
 
 Via GitHub
 ~~~~~~~~~~
-To install the lastest version from github, you can do ``pip install git+https://github.com/AMAAI-Lab/nnAudio.git#subdirectory=Installation``.
+To install the lastest version from github, you can do ``pip install git+https://github.com/AMAAI-Lab/nnAudio2.git#subdirectory=Installation``.
 
 Alternatively, you can also install from the github manually by the following steps:
 
-1. Clone the repository with ``git clone https://github.com/AMAAI-Lab/nnAudio.git <any path you want to save to>``
+1. Clone the repository with ``git clone https://github.com/AMAAI-Lab/nnAudio2.git <any path you want to save to>``
 
 2. ``cd`` into the ``Installation`` folder where the ``setup.py`` is located at
 
@@ -45,20 +45,20 @@ PyTorch >= 1.6.0 (Griffin-Lim only available after 1.6.0)
 
 Python >= 3.8
 
-librosa = 0.7.0 (Theortically nnAudio depends on librosa. But we only need to use a single function mel from librosa.filters. To save users troubles from installing librosa for this single function, I just copy the chunk of functions corresponding to mel in my code so that nnAudio runs without the need to install librosa)
+librosa = 0.7.0 (Theortically nnAudio2 depends on librosa. But we only need to use a single function mel from librosa.filters. To save users troubles from installing librosa for this single function, I just copy the chunk of functions corresponding to mel in my code so that nnAudio2 runs without the need to install librosa)
 
 Usage 
 *****
 
 Standalone Usage
 ~~~~~~~~~~~~~~~~
-To use nnAudio, you need to define the spectrogram layer in the same way as a neural network layer.
+To use nnAudio2, you need to define the spectrogram layer in the same way as a neural network layer.
 After that, you can pass a batch of waveform to that layer to obtain the spectrograms.
 The input shape should be `(batch, len_audio)`.
 
 .. code-block:: python
 
-    from nnAudio import features
+    from nnAudio2 import features
     from scipy.io import wavfile
     import torch
     sr, song = wavfile.read('./Bach.wav') # Loading your audio
@@ -78,12 +78,12 @@ For inverse STFT, use the standard uniform-bin configuration with ``freq_scale='
  
 On-the-fly audio processing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-By integrating nnAudio inside your neural network, it can be used as on-the-fly spectrogram extracting. Here is one example on how to put nnAudio inside your neural network (highlighted in yellow):
+By integrating nnAudio2 inside your neural network, it can be used as on-the-fly spectrogram extracting. Here is one example on how to put nnAudio2 inside your neural network (highlighted in yellow):
 
 .. code-block:: python
     :emphasize-lines: 10-15,32
     
-    from nnAudio import features
+    from nnAudio2 import features
     import torch
     import torch.nn as nn    
     
@@ -148,7 +148,7 @@ to simply do ``net.to(device)``, where ``net = Model()``.
 Speed
 *****
 
-The speed test is conducted using three different machines, and it shows that nnAudio running on GPU is faster than most of the existing libraries.
+The speed test is conducted using three different machines, and it shows that nnAudio2 running on GPU is faster than most of the existing libraries.
 
 * Machine A: Windows Desktop with CPU: Intel Core i7-8700 @ 3.20GHz and GeForce GTX 1070 Ti 8Gb GPU
 
@@ -164,7 +164,7 @@ The speed test is conducted using three different machines, and it shows that nn
 Trainable kernals
 *****************
 
-Fourier basis in :func:`~nnAudio.features.stft.STFT` can be set trainable by using ``trainable=True`` argument. Fourier basis in :func:`~nnAudio.features.mel.MelSpectrogram` can be also set trainable by using `trainable_STFT=True`, and Mel filter banks can be set trainable using ``trainable_mel=False`` argument. The same goes for :func:`~nnAudio.features.cqt.CQT`.
+Fourier basis in :func:`~nnAudio2.features.stft.STFT` can be set trainable by using ``trainable=True`` argument. Fourier basis in :func:`~nnAudio2.features.mel.MelSpectrogram` can be also set trainable by using `trainable_STFT=True`, and Mel filter banks can be set trainable using ``trainable_mel=False`` argument. The same goes for :func:`~nnAudio2.features.cqt.CQT`.
 
 The follow demonstrations are avaliable on Google colab.
 
@@ -197,11 +197,11 @@ For ``CQT1992v2`` and ``CQT2010v2``, the CQT is computed directly in the time do
 without the need of transforming both input waveforms and the CQT kernels to the frequency domain.
 making it faster than the original CQT proposed in 1992.
 
-The default CQT in nnAudio is the ``CQT1992v2`` version.
+The default CQT in nnAudio2 is the ``CQT1992v2`` version.
 For more detail, please refer to our `paper <https://ieeexplore.ieee.org/document/9174990>`__
 
 All versions of CQT are available for users to choose.
-To explicitly choose which CQT to use, you can refer to the :ref:`CQT API section<nnAudio.features.cqt.CQT>`.
+To explicitly choose which CQT to use, you can refer to the :ref:`CQT API section<nnAudio2.features.cqt.CQT>`.
 
 
 .. image:: ../../figures/CQT_compare.png
