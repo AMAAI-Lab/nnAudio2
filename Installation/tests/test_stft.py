@@ -5,7 +5,7 @@ from scipy.signal import chirp, sweep_poly
 import sys
 
 sys.path.insert(0, "./")
-from nnAudio.Spectrogram import *
+from nnAudio2.Spectrogram import *
 from parameters import *
 import warnings
 
