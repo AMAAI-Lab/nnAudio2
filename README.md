@@ -1,5 +1,5 @@
 # nnAudio
-nnAudio 2.0 is an audio processing toolbox using PyTorch convolutional neural network as its backend. By doing so, spectrograms can be generated from audio on-the-fly during neural network training and the Fourier kernels (e.g. or CQT kernels) can be trained. Full details of nnAudio can be found in [our paper](https://ieeexplore.ieee.org/document/9174990). You can use nnAudio for free under MIT licence, however, if you use this library, please cite the paper as per the reference provided below. 
+nnAudio 2.0 is an audio processing toolbox using PyTorch convolutional neural network as its backend. It is based on the original nnAudio repo by Kin Wai Cheuk and maintained by the co-authors of the original paper. In nnAudio, spectrograms can be generated from audio on-the-fly during neural network training and the Fourier kernels (e.g. or CQT kernels) can be trained. Full details of nnAudio can be found in [our paper](https://ieeexplore.ieee.org/document/9174990). You can use nnAudio for free under MIT licence, however, if you use this library, please cite the paper as per the reference provided below. 
 
 ## Installation
 `pip install git+https://github.com/AMAAI-Lab/nnAudio2.git#subdirectory=Installation`
@@ -37,12 +37,9 @@ Note: inverse STFT is currently reliable only for the standard uniform-bin confi
 ## News & Changelog
 To view the full changelog, please go to [CHANGELOG.md](CHANGELOG.md)
 
-**version 0.3.1** (24 Dec 2021):
-1. Added VQT feature [#113](/../../pull/113)
-
-**version 0.3.0** (19 Nov 2021):
-1. Changed module naming. `nnAudio.Spectrogram` will be replaced by `nnAudio.features` in the future releases. Currently, various spectrogram types are accessible via both methods.
-
+**version 2.0.0** (11 April 2026):
+1. Added ...
+   
 
 ## Please cite nnAudio paper if you use it
 The paper describing the release of nnAudio is available on [IEEE Access](https://ieeexplore.ieee.org/document/9174990)
