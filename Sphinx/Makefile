@@ -5,7 +5,7 @@
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 SOURCEDIR     = source
-BUILDDIR      = ../../nnAudio_docs/docs/
+BUILDDIR      = ../../nnAudio2_docs/docs/
 PDFBUILDDIR   = /tmp
 PDF           = ../docs/manual.pdf
 
