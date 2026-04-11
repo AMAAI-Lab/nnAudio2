@@ -1,28 +1,12 @@
-> 🚨 **Maintainers wanted**
-> 
-> This project has grown beyond what one person can maintain.
-> 
-> Due to time constraints, the original author is no longer able to do regular code review.
-> We are looking for contributors who can help with:
-> - Code review
-> - Issue triage
-> - Ongoing maintenance
-> 
-> If you're interested, please comment on
-> [this issue](#140) to introduce yourself.
-
 # nnAudio
-nnAudio is an audio processing toolbox using PyTorch convolutional neural network as its backend. By doing so, spectrograms can be generated from audio on-the-fly during neural network training and the Fourier kernels (e.g. or CQT kernels) can be trained. Full details of nnAudio can be found in [our paper](https://ieeexplore.ieee.org/document/9174990). You can use nnAudio for free, however, if you use this library, please cite the paper as per the reference provided below. 
-
-
-[Kapre](https://github.com/keunwoochoi/kapre) has a similar concept in which they also use 1D convolutional neural network to extract spectrograms based on [Keras](https://keras.io). Other GPU audio processing tools are [torchaudio](https://github.com/pytorch/audio) and [tf.signal](https://www.tensorflow.org/api_docs/python/tf/signal). But they are not using a neural network approach, and hence the Fourier basis can not be trained. As of PyTorch 1.6.0, torchaudio is still very difficult to install under the Windows environment due to `sox`. nnAudio is a more compatible audio processing tool across different operating systems since it relies mostly on PyTorch convolutional neural network. The name of nnAudio comes from `torch.nn`
+nnAudio 2.0 is an audio processing toolbox using PyTorch convolutional neural network as its backend. By doing so, spectrograms can be generated from audio on-the-fly during neural network training and the Fourier kernels (e.g. or CQT kernels) can be trained. Full details of nnAudio can be found in [our paper](https://ieeexplore.ieee.org/document/9174990). You can use nnAudio for free under MIT licence, however, if you use this library, please cite the paper as per the reference provided below. 
 
 ## Installation
-`pip install git+https://github.com/AMAAI-Lab/nnAudio.git#subdirectory=Installation`
+`pip install git+https://github.com/AMAAI-Lab/nnAudio2.git#subdirectory=Installation`
 
 or
 
-`pip install nnaudio==0.3.4`
+`pip install nnaudio==2.0`
 
 ## Documentation
 https://kinwaicheuk.github.io/nnAudio/index.html
