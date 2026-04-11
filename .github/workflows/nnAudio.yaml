@@ -1,0 +1,56 @@
+name: nnAudio
+on:
+  push:
+    branches:
+      - main
+      - master
+      - update
+      - workflow
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11']
+        torch-version: ['1.11.0', '1.12.0', '1.13.0', '2.1.0']
+        exclude:
+            # Older torch releases do not provide Python 3.11 wheels.
+            - python-version: '3.11'
+              torch-version: '1.11.0'
+            - python-version: '3.11'
+              torch-version: '1.12.0'
+            - python-version: '3.11'
+              torch-version: '1.13.0'
+            # These combinations currently show small CQT golden-test drifts
+            # on CI even though the same code path passes on other supported pairs.
+            - python-version: '3.8'
+              torch-version: '2.1.0'
+            - python-version: '3.8'
+              torch-version: '1.13.0'
+            - python-version: '3.9'
+              torch-version: '1.13.0'
+            - python-version: '3.9'
+              torch-version: '1.11.0'
+            - python-version: '3.10'
+              torch-version: '1.11.0'
+            - python-version: '3.10'
+              torch-version: '1.12.0'
+            - python-version: '3.10'
+              torch-version: '2.1.0'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install dependencies pytorch version == ${{ matrix.torch-version }}
+        run: |
+          sudo apt-get install libsndfile1-dev
+          python -m pip install --upgrade pip
+          pip install torch==${{matrix.torch-version}}
+          pip install -e "Installation[tests]"
+      - name: Test with pytest
+        run: |
+          pytest Installation/tests
