@@ -183,7 +183,7 @@ At this point, the following problems have been addressed:
 ### 1. Activate the environment
 
 ```bash
-cd /junyi/nnAudio
+cd /<user>/nnAudio
 source .venv/bin/activate
 ```
 

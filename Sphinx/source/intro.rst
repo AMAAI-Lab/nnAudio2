@@ -23,11 +23,11 @@ The lastest version might not be always available in PyPI, in this case, please 
 
 Via GitHub
 ~~~~~~~~~~
-To install the lastest version from github, you can do ``pip install git+https://github.com/AMAAI-Lab/nnAudio2.git#subdirectory=Installation``.
+To install the lastest version from the anonymous repository, you can do ``pip install git+https://anonymous.4open.science/r/nnAudio2.git#subdirectory=Installation``.
 
 Alternatively, you can also install from the github manually by the following steps:
 
-1. Clone the repository with ``git clone https://github.com/AMAAI-Lab/nnAudio2.git <any path you want to save to>``
+1. Clone the repository with ``git clone https://anonymous.4open.science/r/nnAudio2.git <any path you want to save to>``
 
 2. ``cd`` into the ``Installation`` folder where the ``setup.py`` is located at
 

@@ -1,20 +1,16 @@
 # nnAudio 2.0
-nnAudio 2.0 is an audio processing toolbox using PyTorch convolutional neural network as its backend. It is based on the original nnAudio repo by Kin Wai Cheuk and maintained by the co-authors of the original paper. In nnAudio, spectrograms can be generated from audio on-the-fly during neural network training and the Fourier kernels (e.g. or CQT kernels) can be trained. Full details of nnAudio can be found in [our paper](https://ieeexplore.ieee.org/document/9174990). You can use nnAudio for free under MIT licence, however, if you use this library, please cite the paper as per the reference provided below. 
+nnAudio 2.0 is an audio processing toolbox using PyTorch convolutional neural network as its backend. Spectrograms can be generated from audio on-the-fly during neural network training and the Fourier kernels (e.g. CQT kernels) can be trained. Full details of nnAudio can be found in our paper (currently under review). You can use nnAudio for free under MIT licence. 
 
 ## Installation
-`pip install git+https://github.com/AMAAI-Lab/nnAudio2.git#subdirectory=Installation`
+`pip install git+https://anonymous.4open.science/r/nnAudio2.git#subdirectory=Installation`
 
 or
 
 `pip install nnaudio2`
 
 
-## Documentation
-[https://amaai-lab.github.io/nnAudio2/](https://amaai-lab.github.io/nnAudio2/)
-
-
 ## Comparison with other libraries
-| Feature | [nnAudio](https://github.com/AMAAI-Lab/nnAudio) | [torch.stft](https://github.com/pytorch/pytorch/blob/master/aten/src/ATen/native/SpectralOps.cpp) | [kapre](https://github.com/keunwoochoi/kapre) | [torchaudio](https://github.com/pytorch/audio) | [tf.signal](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/python/ops/signal) | [torch-stft](https://github.com/pseeth/torch-stft) | [librosa](https://github.com/librosa/librosa) |
+| Feature | nnAudio2.0 | [torch.stft](https://github.com/pytorch/pytorch/blob/master/aten/src/ATen/native/SpectralOps.cpp) | [kapre](https://github.com/keunwoochoi/kapre) | [torchaudio](https://github.com/pytorch/audio) | [tf.signal](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/python/ops/signal) | [torch-stft](https://github.com/pseeth/torch-stft) | [librosa](https://github.com/librosa/librosa) |
 | ------- | ------- | ---------- | ----- | ---------- | ---------------------------- | ---------- | ------- |
 | Trainable | ✅ | ❌| ✅ | ❌ | ❌ | ✅ | ❌ |
 | Differentiable | ✅  | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
@@ -43,56 +39,6 @@ To view the full changelog, please go to [CHANGELOG.md](CHANGELOG.md)
 1. Added ...
    
 
-## Please cite nnAudio paper if you use it
-The paper describing the release of nnAudio is available on [IEEE Access](https://ieeexplore.ieee.org/document/9174990)
-
-K. W. Cheuk, H. Anderson, K. Agres and D. Herremans, "nnAudio: An on-the-Fly GPU Audio to Spectrogram Conversion Toolbox Using 1D Convolutional Neural Networks," in IEEE Access, vol. 8, pp. 161981-162003, 2020, doi: 10.1109/ACCESS.2020.3019084.
-
-### BibTex
-```
-@ARTICLE{9174990,
-  author={K. W. {Cheuk} and H. {Anderson} and K. {Agres} and D. {Herremans}},
-  journal={IEEE Access}, 
-  title={nnAudio: An on-the-Fly GPU Audio to Spectrogram Conversion Toolbox Using 1D Convolutional Neural Networks}, 
-  year={2020},
-  volume={8},
-  number={},
-  pages={161981-162003},
-  doi={10.1109/ACCESS.2020.3019084}}
-```
-
-## Call for Contributions
-nnAudio is a fast-growing package. With the increasing number of feature requests, we welcome anyone who is familiar with digital signal processing and neural network to contribute to nnAudio. The current list of pending features includes:
-1. Invertible Constant Q Transform (CQT)
-
-
-(Quick tips for unit test: `cd` inside Installation folder, then type `pytest`. You need at least 1931 MiB GPU memory to pass all the unit tests)
-
-Alternatively, you may also contribute by:
-   1. Making a better demonstration code or tutorial
-
-
-
-
-## Release to PyPI
-This repository includes a GitHub Actions workflow at `.github/workflows/publish-to-pypi.yml` that builds and publishes the package when you push a tag like `v0.3.5`.
-
-Before using it for the first time:
-1. In GitHub, create an environment named `pypi` for this repository and require manual approval for releases.
-2. In PyPI, open the `nnaudio` project settings and add a Trusted Publisher for owner `AMAAI-Lab`, repository `nnAudio`, workflow `.github/workflows/publish-to-pypi.yml`, and environment `pypi`.
-3. Bump `Installation/nnAudio/__init__.py` so `__version__` matches the release tag.
-4. Push the tag, for example `git tag v0.3.5 && git push origin v0.3.5`.
-
-## Dependencies
-Numpy >= 1.14.5, < 2.0
-
-Scipy >= 1.2.0
-
-PyTorch >= 1.6.0 (Griffin-Lim only available after 1.6.0)
-
-Python >= 3.8
-
-librosa = 0.7.0 (Theoretically nnAudio depends on librosa. But we only need to use a single function `mel` from `librosa.filters`. To save users troubles from installing librosa for this single function, I just copy the chunk of functions corresponding to `mel` in my code so that nnAudio runs without the need to install librosa)
 
 
 

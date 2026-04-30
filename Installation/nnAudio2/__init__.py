@@ -4,23 +4,16 @@ import warnings
 __version__ = "2.0.0"
 
 __citation__ = (
-    'K. W. Cheuk, H. Anderson, K. Agres and D. Herremans, "nnAudio: '
+    'Anonymous Authors, "nnAudio: '
     'An on-the-Fly GPU Audio to Spectrogram Conversion Toolbox Using 1D '
-    'Convolutional Neural Networks," IEEE Access, vol. 8, '
-    'pp. 161981-162003, 2020, doi: 10.1109/ACCESS.2020.3019084.'
+    'Convolutional Neural Networks," Under Review.'
 )
 
 _CITATION_REMINDER = f"""
 ============================================================
 nnAudio Citation Reminder
 
-If you like nnAudio, please cite:
-
-K. W. Cheuk, H. Anderson, K. Agres and D. Herremans,
-"nnAudio: An on-the-Fly GPU Audio to Spectrogram Conversion
-Toolbox Using 1D Convolutional Neural Networks,"
-IEEE Access, vol. 8, pp. 161981-162003, 2020,
-doi: 10.1109/ACCESS.2020.3019084.
+If you like nnAudio, please cite our paper (currently under review).
 
 ============================================================
 """.strip()

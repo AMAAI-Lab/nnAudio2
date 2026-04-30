@@ -55,7 +55,7 @@ convolutional neural network. The name of nnAudio2 comes from
 
 The implementation details for **nnAudio2** have also been published in IEEE Access, people who are interested can read the `paper <https://ieeexplore.ieee.org/document/9174990>`__.
 
-The source code for **nnAudio2** can be found in `GitHub <https://github.com/AMAAI-Lab/nnAudio2>`__.
+The source code for **nnAudio2** can be found in `Anonymous Repository <https://anonymous.4open.science/r/nnAudio2>`__.
 
 
 .. toctree::

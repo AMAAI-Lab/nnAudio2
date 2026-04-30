@@ -38,8 +38,8 @@ def get_version(rel_path):
 # -- Project information -----------------------------------------------------
 
 project = "nnAudio2"
-copyright = "2026, AMAAI Lab"
-author = "AMAAI Lab"
+copyright = "2026, Anonymous Authors"
+author = "Anonymous Authors"
 
 # The short X.Y version
 version = get_version("../../Installation/nnAudio2/__init__.py")
@@ -163,7 +163,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, "nnAudio2.tex", "nnAudio2 Documentation", "AMAAI Lab", "manual"),
+    (master_doc, "nnAudio2.tex", "nnAudio2 Documentation", "Anonymous Authors", "manual"),
 ]
 
 
