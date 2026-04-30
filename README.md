@@ -4,7 +4,7 @@ nnAudio 2.0 is an audio processing toolbox using PyTorch convolutional neural ne
 ## Installation
 
 
-Or clone the anonymous repository and install manually:
+Clone the anonymous repository and install manually:
 ```
 git clone https://anonymous.4open.science/r/nnAudio2
 cd nnAudio2/Installation
