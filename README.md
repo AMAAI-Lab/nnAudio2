@@ -2,11 +2,15 @@
 nnAudio 2.0 is an audio processing toolbox using PyTorch convolutional neural network as its backend. Spectrograms can be generated from audio on-the-fly during neural network training and the Fourier kernels (e.g. CQT kernels) can be trained. Full details of nnAudio can be found in our paper (currently under review). You can use nnAudio for free under MIT licence. 
 
 ## Installation
-`pip install git+https://anonymous.4open.science/r/nnAudio2.git#subdirectory=Installation`
-
-or
-
 `pip install nnaudio2`
+
+Or clone the anonymous repository and install manually:
+```
+git clone https://anonymous.4open.science/r/nnAudio2
+cd nnAudio2/Installation
+pip install .
+```
+
 
 
 ## Comparison with other libraries
@@ -33,9 +37,7 @@ or
 Note: inverse STFT is currently reliable only for the standard uniform-bin configuration with `freq_scale='no'`. Non-uniform STFT variants such as `linear`, `log`, and `log2` should be treated as analysis-only.
 
 ## News & Changelog
-To view the full changelog, please go to [CHANGELOG.md](CHANGELOG.md)
-
-**version 2.0.0** (11 April 2026):
+**version 2.0.0** (April 2026):
 1. Added ...
    
 
