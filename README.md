@@ -9,6 +9,9 @@ or
 `pip install nnaudio2`
 
 
+## Documentation
+[https://amaai-lab.github.io/nnAudio2/](https://amaai-lab.github.io/nnAudio2/)
+
 
 ## Comparison with other libraries
 | Feature | [nnAudio](https://github.com/AMAAI-Lab/nnAudio) | [torch.stft](https://github.com/pytorch/pytorch/blob/master/aten/src/ATen/native/SpectralOps.cpp) | [kapre](https://github.com/keunwoochoi/kapre) | [torchaudio](https://github.com/pytorch/audio) | [tf.signal](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/python/ops/signal) | [torch-stft](https://github.com/pseeth/torch-stft) | [librosa](https://github.com/librosa/librosa) |
