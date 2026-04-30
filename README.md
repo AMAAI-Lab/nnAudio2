@@ -2,7 +2,7 @@
 nnAudio 2.0 is an audio processing toolbox using PyTorch convolutional neural network as its backend. Spectrograms can be generated from audio on-the-fly during neural network training and the Fourier kernels (e.g. CQT kernels) can be trained. Full details of nnAudio can be found in our paper (currently under review). You can use nnAudio for free under MIT licence. 
 
 ## Installation
-`pip install nnaudio2`
+
 
 Or clone the anonymous repository and install manually:
 ```
