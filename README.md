@@ -1,4 +1,4 @@
-# nnAudio
+# nnAudio 2.0
 nnAudio 2.0 is an audio processing toolbox using PyTorch convolutional neural network as its backend. It is based on the original nnAudio repo by Kin Wai Cheuk and maintained by the co-authors of the original paper. In nnAudio, spectrograms can be generated from audio on-the-fly during neural network training and the Fourier kernels (e.g. or CQT kernels) can be trained. Full details of nnAudio can be found in [our paper](https://ieeexplore.ieee.org/document/9174990). You can use nnAudio for free under MIT licence, however, if you use this library, please cite the paper as per the reference provided below. 
 
 ## Installation
@@ -8,8 +8,10 @@ or
 
 `pip install nnaudio2`
 
+
 ## Documentation
 [https://amaai-lab.github.io/nnAudio2/](https://amaai-lab.github.io/nnAudio2/)
+
 
 ## Comparison with other libraries
 | Feature | [nnAudio](https://github.com/AMAAI-Lab/nnAudio) | [torch.stft](https://github.com/pytorch/pytorch/blob/master/aten/src/ATen/native/SpectralOps.cpp) | [kapre](https://github.com/keunwoochoi/kapre) | [torchaudio](https://github.com/pytorch/audio) | [tf.signal](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/python/ops/signal) | [torch-stft](https://github.com/pseeth/torch-stft) | [librosa](https://github.com/librosa/librosa) |
