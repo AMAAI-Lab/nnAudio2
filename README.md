@@ -40,7 +40,7 @@ Note: inverse STFT is currently reliable only for the standard uniform-bin confi
 To view the full changelog, please go to [CHANGELOG.md](CHANGELOG.md)
 
 **version 2.0.0** (11 April 2026):
-1. Added ...
+1. Full rehaul of nnAudio. Details available in paper. 
    
 
 ## Please cite nnAudio paper if you use it
@@ -65,11 +65,9 @@ K. W. Cheuk, H. Anderson, K. Agres and D. Herremans, "nnAudio: An on-the-Fly GPU
 nnAudio is a fast-growing package. With the increasing number of feature requests, we welcome anyone who is familiar with digital signal processing and neural network to contribute to nnAudio. The current list of pending features includes:
 1. Invertible Constant Q Transform (CQT)
 
-
 (Quick tips for unit test: `cd` inside Installation folder, then type `pytest`. You need at least 1931 MiB GPU memory to pass all the unit tests)
 
-Alternatively, you may also contribute by:
-   1. Making a better demonstration code or tutorial
+Alternatively, you may also contribute by making a better demonstration code or tutorial
 
 
 
@@ -90,13 +88,5 @@ Scipy >= 1.2.0
 
 PyTorch >= 1.6.0 (Griffin-Lim only available after 1.6.0)
 
-Python >= 3.8
+Python >= 3.11
 
-librosa = 0.7.0 (Theoretically nnAudio depends on librosa. But we only need to use a single function `mel` from `librosa.filters`. To save users troubles from installing librosa for this single function, I just copy the chunk of functions corresponding to `mel` in my code so that nnAudio runs without the need to install librosa)
-
-
-
-## Other similar libraries
-[Kapre](https://www.semanticscholar.org/paper/Kapre%3A-On-GPU-Audio-Preprocessing-Layers-for-a-of-Choi-Joo/b1ad5643e5dd66fac27067b00e5c814f177483ca?citingPapersSort=is-influential#citing-papers)
-
-[torch-stft](https://github.com/pseeth/torch-stft)
