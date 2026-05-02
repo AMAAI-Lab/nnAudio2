@@ -72,9 +72,11 @@ spec  = mel(audio)                          # [4, 128, T] — on GPU
 
 ---
 
-## Changelog
+## Changelog & migration
 
 Full changelog: [CHANGELOG.md](CHANGELOG.md)
+
+**Migrating from nnAudio?** See [MIGRATION_SUMMARY.md](MIGRATION_SUMMARY.md) for a concise breakdown of every change, the reasoning behind each fix, and how to verify your environment.
 
 **v2.0.0** (April 2026) — full overhaul of nnAudio. See the nnAudio2 paper for details.
 

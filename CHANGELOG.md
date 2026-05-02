@@ -1,5 +1,25 @@
 # Changelog
 
+## version 2.0.0 (April 2026) — nnAudio2
+
+Full overhaul of nnAudio for modern PyTorch and the current scientific Python ecosystem.
+Package renamed from `nnAudio` to `nnAudio2`; the original nnAudio repository is no longer maintained.
+
+Key changes:
+
+- **TorchScript support** (issue [#132](../../issues/132)): resolved compilation failures in `STFT` and `iSTFT` by removing dynamic state mutation and module construction from scripted code paths, and tightening argument handling for TorchScript-facing helpers.
+- **Safe iSTFT semantics** (issue [#136](../../issues/136)): reliable inversion is now restricted to `freq_scale='no'`. Non-uniform variants (`linear`, `log`, `log2`) raise an explicit `RuntimeError` instead of silently returning poor reconstructions.
+- **CFP / SciPy compatibility**: updated `cfp.py` to use `scipy.signal.windows.blackmanharris` (modern SciPy location).
+- **VQT correctness**: `VQT(gamma=0)` now explicitly delegates to `CQT1992v2`, aligning its output with CQT behavior.
+- **Citation reminder**: `import nnAudio2` shows a citation reminder by default; suppress with `NNAUDIO_DISABLE_CITATION_REMINDER=1`.
+- **Dependency baseline**: Python ≥ 3.11, PyTorch ≥ 2.0, NumPy 2.x, current SciPy.
+- **Test suite**: 57 tests pass in the modern environment; new regression tests cover TorchScript compilation and iSTFT rejection behavior.
+
+For a full technical summary of what changed and why, see [MIGRATION_SUMMARY.md](MIGRATION_SUMMARY.md).  
+For the detailed development log (per-batch changes, before/after test results), see [MIGRATION_LOG.md](MIGRATION_LOG.md).
+
+---
+
 ## version 0.3.0 (19 Nov 2021):
 1. Changed module naming. `nnAudio.Spectrogram` will be replaced by `nnAudio.features` in the future releases. Currently, various spectrogram types are accessible via both methods.
 

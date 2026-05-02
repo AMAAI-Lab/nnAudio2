@@ -1,304 +1,146 @@
-# nnAudio Migration Summary
+# nnAudio2 Migration Summary
 
-This document summarizes what we changed in `nnAudio`, which problems were fixed, how to run the project locally, and what results we expect to see.
+This document describes what changed between nnAudio (≤ 0.3.x) and nnAudio2 (2.0.0), why each change was made, and how to verify the results.
 
-The work described here focuses on the professor's explicit requests: compatibility with current Torch and dependencies, issue `#132`, issue `#136`, and a citation reminder for users.
+For the full per-batch development log, see [MIGRATION_LOG.md](MIGRATION_LOG.md).
 
-## Verified Environment
+---
 
-The current local verification environment is:
+## Verified environment
 
-- Python: `3.11.10`
-- Torch: `2.10.0+cpu`
-- NumPy: `2.4.3`
-- SciPy: `1.17.1`
-- librosa: `0.11.0`
-- nnAudio package version: `0.3.4`
+| Dependency | Version used |
+|------------|-------------|
+| Python     | 3.11.10     |
+| PyTorch    | 2.10.0      |
+| NumPy      | 2.4.3       |
+| SciPy      | 1.17.1      |
+| librosa    | 0.11.0      |
 
-Notes:
+---
 
-- The codebase has been updated to run correctly in this modern dependency environment.
-- We did not bump the package version to `2.0`; functionally, this is the start of maintaining a newer generation of nnAudio, not a formal package release named `2.0`.
+## Changes
 
-## What Changed and What Each Change Fixed
+### `features/stft.py` — TorchScript support (issue #132)
 
-### `Installation/nnAudio/features/stft.py`
+**Problem:** `torch.jit.script(STFT(...))` and `torch.jit.script(iSTFT(...))` both failed.
 
-This file received the largest set of changes and addresses two main issues.
+Root causes:
+1. `STFT.forward()` assigned `self.num_samples` dynamically — TorchScript does not allow setting undeclared attributes.
+2. `STFT.forward()` constructed `nn.ConstantPad1d` / `nn.ReflectionPad1d` at runtime — TorchScript does not allow dynamic module construction inside `forward`.
+3. `iSTFT` used `refresh_win == None`-style control flow that TorchScript could not type-infer correctly.
 
-#### Issue A: issue #132, TorchScript compilation failures
+Fixes:
+- Replaced dynamic attribute assignment with local variables.
+- Replaced runtime-constructed padding modules with functional padding calls (`F.pad`).
+- Tightened optional-argument handling in `STFT.forward`, `STFT.inverse`, and `iSTFT.forward`.
+- Updated `inverse_stft` to use local tensors for window normalisation under scripting, while preserving the eager-mode cache.
 
-Original problem:
+Result: `STFT` and `iSTFT` now compile with `torch.jit.script`.
 
-- `torch.jit.script(STFT(...))` failed
-- `torch.jit.script(iSTFT(...))` also failed
+---
 
-Main causes:
+### `features/stft.py` — Safe iSTFT semantics (issue #136)
 
-1. Dynamic module attribute assignment inside `forward()`
-2. Dynamic padding module construction inside `forward()`
-3. `None` handling in `iSTFT` that was not TorchScript-friendly
+**Problem:** Calling inverse STFT with `freq_scale='linear'` or `freq_scale='log'` silently returned severely degraded audio:
 
-What we changed:
+| `freq_scale` | MSE (baseline) | SNR (baseline) |
+|---|---|---|
+| `'no'`     | ~1.5 × 10⁻¹³ | ~128 dB |
+| `'linear'` | ~1.14         | ~−0.5 dB |
+| `'log'`    | ~1.67         | ~−2.2 dB |
 
-1. Replaced dynamic attribute writes with local variables
-2. Replaced dynamically constructed padding modules with functional padding
-3. Tightened argument handling for TorchScript-facing paths
+The reconstruction was not just noisy — it was essentially wrong — but no error was raised.
 
-Result:
-
-- `STFT` can now be compiled with `torch.jit.script(...)`
-- `iSTFT` can now be compiled with `torch.jit.script(...)`
-
-#### Issue B: issue #136, non-uniform STFT inverse silently returned poor output
-
-Original problem:
-
-- `freq_scale='linear'` or `freq_scale='log'` produced clearly poor inverse reconstructions
-- The code did not fail, which was misleading for users
-
-What we changed:
-
-1. Added explicit inverse-support checks
-2. Defined reliable inverse support only for the standard uniform-bin case with `freq_scale='no'`
-3. Non-uniform frequency scales (`linear`, `log`, `log2`) now raise a clear runtime error on inverse
-4. Initialization warnings were added to mark these configurations as analysis-only
+Fix:
+- Added `self.supports_inverse` tracking per frequency scale.
+- `STFTBase` now raises `RuntimeError` on any inverse call when `freq_scale != 'no'`.
+- Initialization emits a warning when an inverse-capable object is created with a non-uniform scale.
 
 Result:
+- `freq_scale='no'`: inverse still works (MSE ~4 × 10⁻¹⁴).
+- `freq_scale='linear'` / `'log'` / `'log2'`: raises a clear `RuntimeError` instead of returning bad audio.
 
-- `freq_scale='no'`: inverse still works
-- `freq_scale='linear' / 'log' / 'log2'`: inverse no longer silently returns bad audio; it now fails explicitly
+---
 
-### `Installation/nnAudio/utils.py`
+### `utils.py` — TorchScript helper annotations (issue #132)
 
-This file was updated to support the TorchScript fix for issue `#132`.
+**Problem:** After the `stft.py` fixes, TorchScript compilation moved on to fail in the helper functions used by `iSTFT`.
 
-What we changed:
+Fixes:
+- Added explicit type annotations to `torch_window_sumsquare` and `overlap_add`.
+- Changed `fold(..., stride=...)` calls to pass stride as a 2-element tuple rather than a bare integer, matching current TorchScript type expectations.
 
-1. Added explicit type annotations to `torch_window_sumsquare(...)` and `overlap_add(...)`
-2. Adjusted `fold(..., stride=...)` argument handling to better match current Torch / TorchScript behavior
+---
 
-Result:
+### `features/cfp.py` — SciPy compatibility
 
-- The helper functions used by `iSTFT` can now be handled correctly by TorchScript
+**Problem:** `scipy.signal.blackmanharris` was removed from the top-level `scipy.signal` namespace in modern SciPy.
 
-### `Installation/tests/test_stft.py`
+Fix: changed both `Combined_Frequency_Periodicity` and `CFP` to use `scipy.signal.windows.blackmanharris`.
 
-This file received new regression tests.
+---
 
-New coverage includes:
+### `features/vqt.py` — VQT / CQT alignment
 
-1. TorchScript compilation for `STFT`
-2. TorchScript compilation for `iSTFT`
-3. Rejection behavior for inverse on non-uniform frequency scales
+**Problem:** `VQT(gamma=0)` should reduce to CQT, but showed a meaningful numerical mismatch against `CQT1992v2` (max absolute error ~0.089).
 
-Result:
+Fix: when `gamma == 0`, `VQT.__init__` now creates an internal `CQT1992v2` module and `VQT.forward` delegates to it.
 
-- These behaviors are now covered by tests instead of being only manually verified once
+---
 
-### `Installation/nnAudio/features/cfp.py`
+### `__init__.py` — Citation reminder
 
-This file was updated for modern SciPy compatibility.
+Added import-time citation reminder so users who install the package are prompted to cite the paper.
 
-Original problem:
+- `nnAudio2.__citation__` — citation string
+- `nnAudio2.cite()` — returns the citation string
+- `nnAudio2.show_citation()` — prints it
+- `CitationReminderWarning` shown once per process on `import nnAudio2`
+- Set `NNAUDIO_DISABLE_CITATION_REMINDER=1` to suppress
 
-- `scipy.signal.blackmanharris` was no longer available at the old location under the current SciPy version
+---
 
-What we changed:
+## Test results
 
-- Switched to `scipy.signal.windows.blackmanharris`
+| Stage | Passed | Failed |
+|-------|--------|--------|
+| Baseline (before any changes) | 44 | 3 |
+| After TorchScript fix (#132)  | 46 | 3 |
+| After CFP fix                 | 48 | 1 |
+| After VQT fix                 | 49 | 0 |
+| After iSTFT semantics (#136)  | 54 | 0 |
+| After citation reminder       | **57** | **0** |
 
-Result:
+---
 
-- CFP-related tests now pass again
-
-### `Installation/nnAudio/features/vqt.py`
-
-This file was updated to fix VQT/CQT compatibility behavior.
-
-Original problem:
-
-- `VQT(gamma=0)` should theoretically reduce to CQT, but it showed a meaningful mismatch against `CQT1992v2`
-
-What we changed:
-
-- When `gamma == 0`, `VQT` now explicitly routes through `CQT1992v2`
-
-Result:
-
-- `VQT(gamma=0)` is aligned with CQT behavior
-- The related tests now pass
-
-### `Installation/nnAudio/__init__.py`
-
-This file implements the citation reminder requested by the professor.
-
-Added:
-
-1. `__citation__`
-2. `cite()`
-3. `show_citation()`
-4. `CitationReminderWarning`
-5. Import-time citation reminder
-6. `NNAUDIO_DISABLE_CITATION_REMINDER=1` to suppress the reminder
-
-Result:
-
-- `import nnAudio` now reminds users to cite the paper
-- Users can also access the citation programmatically
-
-### `Installation/tests/test_package.py`
-
-This is a new test file for citation-related behavior.
-
-Coverage includes:
-
-1. Citation text exists and contains the DOI
-2. The import-time warning appears
-3. The suppress environment variable works
-
-### Documentation Updates
-
-To avoid misleading users about issue `#136`, we also updated:
-
-1. `README.md`
-2. `Sphinx/source/intro.rst`
-3. `Sphinx/source/index.rst`
-
-The purpose here was not to expand scope, but to document the new supported/unsupported boundary clearly.
-
-## What Problems Are Now Resolved
-
-At this point, the following problems have been addressed:
-
-1. Core compatibility issues with current Torch and current dependencies
-2. issue `#132`: `STFT` / `iSTFT` could not be compiled with TorchScript
-3. issue `#136`: non-uniform frequency-scale inverse silently returned poor results
-4. CFP initialization failed under modern SciPy
-5. `VQT(gamma=0)` did not align with CQT behavior
-6. The package had no built-in citation reminder
-
-## How To Run
-
-### 1. Activate the environment
+## Running the test suite
 
 ```bash
-cd /junyi/nnAudio
-source .venv/bin/activate
+cd Installation
+pytest -q
 ```
 
-### 2. Run the full test suite
+To run only STFT/iSTFT tests:
 
 ```bash
-pytest Installation/tests -q
+pytest tests/test_stft.py -q
 ```
 
-### 3. Run only TorchScript / STFT-related tests
+To verify the citation reminder:
 
 ```bash
-pytest Installation/tests/test_stft.py -q
+python -c "import nnAudio2"
+# suppress with: NNAUDIO_DISABLE_CITATION_REMINDER=1 python -c "import nnAudio2"
 ```
 
-### 4. Check the citation reminder
+---
 
-```bash
-python - <<'PY'
-import nnAudio
-print(nnAudio.__version__)
-print(nnAudio.__citation__)
-PY
-```
+## Known non-blocking warnings
 
-### 5. Suppress the citation reminder if needed
+The following warnings appear in the test suite but do not cause failures:
 
-```bash
-NNAUDIO_DISABLE_CITATION_REMINDER=1 python - <<'PY'
-import nnAudio
-print(nnAudio.__version__)
-PY
-```
+- CFP emits a `divide by zero` warning (pre-existing).
+- `torch.stft(return_complex=False)` has a deprecation warning in newer PyTorch.
+- `torch.jit.script` itself is deprecated in very recent PyTorch versions.
 
-## Expected Results
-
-### Full test suite
-
-Command:
-
-```bash
-pytest Installation/tests -q
-```
-
-Expected result:
-
-- You should currently see `57 passed`
-- A number of warnings are acceptable
-- There should be no failed tests
-
-### TorchScript
-
-`STFT` and `iSTFT` should now compile with `torch.jit.script(...)` and should no longer raise the original issue `#132` errors.
-
-### Standard inverse
-
-For:
-
-- `freq_scale='no'`
-
-Expected result:
-
-- inverse works
-- reconstruction error remains very small
-
-### Non-uniform inverse
-
-For:
-
-- `freq_scale='linear'`
-- `freq_scale='log'`
-- `freq_scale='log2'`
-
-Expected result:
-
-- inverse raises a clear exception
-- this is expected behavior, not a bug
-
-Reason:
-
-- under the current implementation, these inverse paths are not numerically reliable
-- explicit failure is safer than silently returning poor output
-
-### Citation reminder
-
-Command:
-
-```bash
-python - <<'PY'
-import nnAudio
-PY
-```
-
-Expected result:
-
-- a `CitationReminderWarning` is shown
-- it reminds the user to cite the nnAudio paper
-
-## Current Non-Blocking Warnings
-
-The test suite now passes completely, but a few warnings are still present:
-
-1. CFP still emits a `divide by zero` warning
-2. `torch.stft(return_complex=False)` has a future deprecation warning
-3. `torch.jit.script` itself is deprecated in newer Torch versions
-
-These are not blockers for the professor's current task, but they are reasonable cleanup targets for a later maintenance pass.
-
-## Current Conclusion
-
-Against the professor's explicit task list:
-
-1. Current Torch / dependency compatibility: validated locally in a modern environment
-2. issue `#132`: completed
-3. issue `#136`: completed via a safe supported/unsupported boundary
-4. Citation reminder: completed via import-time reminder
-
-At this stage, the core task requested by the professor can be considered complete.
+These are reasonable cleanup targets for a future maintenance pass.
