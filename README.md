@@ -1,92 +1,145 @@
-# nnAudio 2.0
-nnAudio 2.0 is an audio processing toolbox using PyTorch convolutional neural network as its backend. It is based on the original nnAudio repo by Kin Wai Cheuk and maintained by the co-authors of the original paper. In nnAudio, spectrograms can be generated from audio on-the-fly during neural network training and the Fourier kernels (e.g. or CQT kernels) can be trained. Full details of nnAudio can be found in [our paper](https://ieeexplore.ieee.org/document/9174990). You can use nnAudio for free under MIT licence, however, if you use this library, please cite the paper as per the reference provided below. 
+# nnAudio2
+
+**nnAudio2** is an audio feature extraction toolbox for deep learning, built on PyTorch. Spectrograms and other audio transforms are implemented as `nn.Module` layers — they run on-device (CUDA, MPS, or CPU), are fully differentiable, and can be embedded directly inside a neural network. Filter banks (Mel, CQT, STFT kernels) can optionally be made **trainable**.
+
+nnAudio2 is developed and maintained by the [AMAAI Lab](https://amaai-lab.github.io/) at SUTD. It is a modernised successor to [nnAudio](https://github.com/AMAAI-Lab/nnAudio), which is no longer actively maintained. The original nnAudio codebase has been fully overhauled to work with modern PyTorch and the current scientific Python ecosystem.
+
+---
 
 ## Installation
-`pip install git+https://github.com/AMAAI-Lab/nnAudio2.git#subdirectory=Installation`
 
-or
+```bash
+pip install nnaudio2
+```
 
-`pip install nnaudio2`
+or directly from the repository:
 
+```bash
+pip install git+https://github.com/AMAAI-Lab/nnAudio2.git#subdirectory=Installation
+```
 
 ## Documentation
+
 [https://amaai-lab.github.io/nnAudio2/](https://amaai-lab.github.io/nnAudio2/)
 
+---
 
-## Comparison with other libraries
-| Feature | [nnAudio](https://github.com/AMAAI-Lab/nnAudio) | [torch.stft](https://github.com/pytorch/pytorch/blob/master/aten/src/ATen/native/SpectralOps.cpp) | [kapre](https://github.com/keunwoochoi/kapre) | [torchaudio](https://github.com/pytorch/audio) | [tf.signal](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/python/ops/signal) | [torch-stft](https://github.com/pseeth/torch-stft) | [librosa](https://github.com/librosa/librosa) |
-| ------- | ------- | ---------- | ----- | ---------- | ---------------------------- | ---------- | ------- |
-| Trainable | ✅ | ❌| ✅ | ❌ | ❌ | ✅ | ❌ |
-| Differentiable | ✅  | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Linear frequency STFT| ✅  | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Logarithmic frequency STFT| ✅  | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Inverse STFT| ✅  | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Griffin-Lim| ✅  | ❌ | ❌ | ✅ | ✅ | ❌ | ✅ |
-| Mel | ✅ | ❌ | ✅ | ✅ | ✅ | ❌ | ✅ |
-| MFCC | ✅  | ❌ | ❌ | ✅| ✅ | ❌ | ✅ |
-| CQT | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| VQT | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Gammatone | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| CFP<sup>1</sup> | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| GPU support | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
+## Supported transforms
 
-✅: Fully support    ☑️: Developing (only available in dev version)    ❌: Not support
+| Transform | Trainable | Differentiable | Invertible |
+|-----------|:---------:|:--------------:|:----------:|
+| STFT | ✅ | ✅ | ✅ (uniform bin only) |
+| Mel Spectrogram | ✅ | ✅ | — |
+| MFCC | ✅ | ✅ | — |
+| CQT | ✅ | ✅ | — |
+| VQT | ✅ | ✅ | — |
+| Gammatone | ✅ | ✅ | — |
+| CFP | ✅ | ✅ | — |
+| Griffin-Lim | — | ✅ | — |
 
-<sup>1</sup> [Combining Spectral and Temporal Representations for Multipitch Estimation of Polyphonic Music](https://ieeexplore.ieee.org/document/7118691)
+All transforms run on **CUDA**, **MPS (Apple Silicon)**, and **CPU**.
 
-Note: inverse STFT is currently reliable only for the standard uniform-bin configuration with `freq_scale='no'`. Non-uniform STFT variants such as `linear`, `log`, and `log2` should be treated as analysis-only.
+> **Note on inverse STFT:** reliable reconstruction is only guaranteed for the uniform-bin setting (`freq_scale='no'`). Non-uniform variants (`linear`, `log`, `log2`) are analysis-only; attempting inversion raises an explicit error.
 
-## News & Changelog
-To view the full changelog, please go to [CHANGELOG.md](CHANGELOG.md)
+---
 
-**version 2.0.0** (11 April 2026):
-1. Full rehaul of nnAudio. Details available in paper. 
-   
+## What's new in nnAudio2
 
-## Please cite nnAudio paper if you use it
-The paper describing the release of nnAudio is available on [IEEE Access](https://ieeexplore.ieee.org/document/9174990)
+nnAudio2 modernises the original library for current PyTorch and scientific Python environments. Key improvements:
 
-K. W. Cheuk, H. Anderson, K. Agres and D. Herremans, "nnAudio: An on-the-Fly GPU Audio to Spectrogram Conversion Toolbox Using 1D Convolutional Neural Networks," in IEEE Access, vol. 8, pp. 161981-162003, 2020, doi: 10.1109/ACCESS.2020.3019084.
+- **TorchScript compatibility** — resolved compilation failures in STFT and iSTFT by removing dynamic state mutation and module construction from scripted code paths.
+- **Correct iSTFT semantics** — inversion is restricted to `freq_scale='no'`; unsupported configurations now raise an explicit `RuntimeError` instead of returning silently degraded output.
+- **CFP restored** — compatibility with modern SciPy is fixed.
+- **VQT correctness** — VQT now correctly reduces to CQT when `gamma = 0`.
+- **Modern dependencies** — tested against current PyTorch, NumPy 2.x, and SciPy releases.
+- **Expanded test suite** — regression tests cover new STFT/iSTFT behaviours; the full suite passes in a modern Python environment.
 
-### BibTex
+---
+
+## Quick start
+
+```python
+import torch
+from nnAudio2.features.mel import MelSpectrogram
+
+# Drop the transform in as a model layer
+mel = MelSpectrogram(sr=22050, n_fft=1024, hop_length=512, n_mels=128)
+mel = mel.to('cuda')   # or 'mps' on Apple Silicon
+
+audio = torch.randn(4, 22050).to('cuda')   # batch of 4 × 1-second clips
+spec  = mel(audio)                          # [4, 128, T] — on GPU
 ```
-@ARTICLE{9174990,
-  author={K. W. {Cheuk} and H. {Anderson} and K. {Agres} and D. {Herremans}},
-  journal={IEEE Access}, 
-  title={nnAudio: An on-the-Fly GPU Audio to Spectrogram Conversion Toolbox Using 1D Convolutional Neural Networks}, 
-  year={2020},
-  volume={8},
-  number={},
-  pages={161981-162003},
-  doi={10.1109/ACCESS.2020.3019084}}
+
+---
+
+## Changelog
+
+Full changelog: [CHANGELOG.md](CHANGELOG.md)
+
+**v2.0.0** (April 2026) — full overhaul of nnAudio. See the nnAudio2 paper for details.
+
+---
+
+## Citation
+
+If you use nnAudio2, please cite **both** papers.
+
+### nnAudio2 (this repository)
+
+> Abhinaba Roy, Junyi Liang, Dorien Herremans. (2026). *nnAudio 2: Overcoming Dynamic Compilation Barriers and Transform Inconsistencies.* arXiv (forthcoming).
+
+```bibtex
+@article{roy2026nnaudio2,
+  author  = {Roy, Abhinaba and Liang, Junyi and Herremans, Dorien},
+  title   = {nnAudio 2: Overcoming Dynamic Compilation Barriers and Transform Inconsistencies},
+  journal = {arXiv},
+  year    = {2026},
+}
 ```
 
-## Call for Contributions
-nnAudio is a fast-growing package. With the increasing number of feature requests, we welcome anyone who is familiar with digital signal processing and neural network to contribute to nnAudio. The current list of pending features includes:
-1. Invertible Constant Q Transform (CQT)
+### Original nnAudio
 
-(Quick tips for unit test: `cd` inside Installation folder, then type `pytest`. You need at least 1931 MiB GPU memory to pass all the unit tests)
+> K. W. Cheuk, H. Anderson, K. Agres and D. Herremans, "nnAudio: An on-the-Fly GPU Audio to Spectrogram Conversion Toolbox Using 1D Convolutional Neural Networks," *IEEE Access*, vol. 8, pp. 161981–162003, 2020. doi: [10.1109/ACCESS.2020.3019084](https://ieeexplore.ieee.org/document/9174990)
 
-Alternatively, you may also contribute by making a better demonstration code or tutorial
+```bibtex
+@article{cheuk2020nnaudio,
+  author  = {Cheuk, Kin Wai and Anderson, Hans and Agres, Kat and Herremans, Dorien},
+  journal = {IEEE Access},
+  title   = {nnAudio: An on-the-Fly {GPU} Audio to Spectrogram Conversion Toolbox Using 1D Convolutional Neural Networks},
+  year    = {2020},
+  volume  = {8},
+  pages   = {161981--162003},
+  doi     = {10.1109/ACCESS.2020.3019084},
+}
+```
 
+---
 
+## Contributing
 
+Contributions are welcome. To run the test suite:
 
-## Release to PyPI
-This repository includes a GitHub Actions workflow at `.github/workflows/publish-to-pypi.yml` that builds and publishes the package when you push a tag like `v0.3.5`.
+```bash
+cd Installation
+pytest
+```
 
-Before using it for the first time:
-1. In GitHub, create an environment named `pypi` for this repository and require manual approval for releases.
-2. In PyPI, open the `nnaudio` project settings and add a Trusted Publisher for owner `AMAAI-Lab`, repository `nnAudio`, workflow `.github/workflows/publish-to-pypi.yml`, and environment `pypi`.
-3. Bump `Installation/nnAudio/__init__.py` so `__version__` matches the release tag.
-4. Push the tag, for example `git tag v0.3.5 && git push origin v0.3.5`.
+---
+
+## Publishing to PyPI
+
+A GitHub Actions workflow at `.github/workflows/publish-to-pypi.yml` publishes the package when a version tag is pushed.
+
+1. Create a `pypi` environment in the GitHub repository settings and require manual approval.
+2. In PyPI, add a Trusted Publisher for `AMAAI-Lab / nnAudio2`, workflow `publish-to-pypi.yml`, environment `pypi`.
+3. Bump `__version__` in `Installation/nnAudio2/__init__.py` to match the tag.
+4. Push the tag: `git tag v2.0.1 && git push origin v2.0.1`.
+
+---
 
 ## Dependencies
-Numpy >= 1.14.5, < 2.0
 
-Scipy >= 1.2.0
-
-PyTorch >= 1.6.0 (Griffin-Lim only available after 1.6.0)
-
-Python >= 3.11
-
+- Python ≥ 3.11
+- PyTorch ≥ 2.0
+- NumPy ≥ 1.14.5
+- SciPy ≥ 1.2.0
