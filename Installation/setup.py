@@ -81,14 +81,14 @@ if bdist_wheel is not None:
 setuptools.setup(
     name="nnaudio2",  # Replace with your own username
     version=PACKAGE_METADATA["__version__"],
-    author="KinWaiCheuk",
-    author_email="u3500684@connect.hku.hk",
+    author="AMAAI Lab",
+    author_email="dorien.herremans@gmail.com",
     description="A fast GPU audio processing toolbox with 1D convolutional neural network",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/AMAAI-Lab/nnAudio2",
     project_urls={
-        "Documentation": "https://kinwaicheuk.github.io/nnAudio/index.html",
+        "Documentation": "https://amaai-lab.github.io/nnAudio2/",
         "Issues": "https://github.com/AMAAI-Lab/nnAudio2/issues",
         "Source": "https://github.com/AMAAI-Lab/nnAudio2",
     },
