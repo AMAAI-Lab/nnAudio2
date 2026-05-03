@@ -59,7 +59,10 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#speed">Speed</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#trainable-kernels">Trainable kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#trainable-kernels">Trainable kernels</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#invertible-cqt">Invertible CQT</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="#cqt-variants">CQT variants</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
@@ -229,6 +232,28 @@ nnAudio2 running on GPU outperforms most existing audio processing libraries.</p
 <a class="reference internal" href="_autosummary/nnAudio2.features.stft.STFT.html#nnAudio2.features.stft.STFT" title="nnAudio2.features.stft.STFT"><code class="xref py py-func docutils literal notranslate"><span class="pre">STFT()</span></code></a>, or <code class="docutils literal notranslate"><span class="pre">trainable_mel=True</span></code> / <code class="docutils literal notranslate"><span class="pre">trainable_STFT=True</span></code>
 to <a class="reference internal" href="_autosummary/nnAudio2.features.mel.MelSpectrogram.html#nnAudio2.features.mel.MelSpectrogram" title="nnAudio2.features.mel.MelSpectrogram"><code class="xref py py-func docutils literal notranslate"><span class="pre">MelSpectrogram()</span></code></a>, or <code class="docutils literal notranslate"><span class="pre">trainable=True</span></code> to
 <a class="reference internal" href="_autosummary/nnAudio2.features.cqt.CQT.html#nnAudio2.features.cqt.CQT" title="nnAudio2.features.cqt.CQT"><code class="xref py py-func docutils literal notranslate"><span class="pre">CQT()</span></code></a>.</p>
+<section id="invertible-cqt">
+<h2>Invertible CQT<a class="headerlink" href="#invertible-cqt" title="Link to this heading"></a></h2>
+<p><a class="reference internal" href="_autosummary/nnAudio2.features.cqt.iCQT.html#nnAudio2.features.cqt.iCQT" title="nnAudio2.features.cqt.iCQT"><code class="xref py py-func docutils literal notranslate"><span class="pre">iCQT()</span></code></a> reconstructs a waveform from the complex output of
+<a class="reference internal" href="_autosummary/nnAudio2.features.cqt.CQT1992v2.html#nnAudio2.features.cqt.CQT1992v2" title="nnAudio2.features.cqt.CQT1992v2"><code class="xref py py-func docutils literal notranslate"><span class="pre">CQT1992v2()</span></code></a>. It uses iterative Landweber inversion and is
+fully differentiable. Reconstruction SNR exceeds 30 dB for signals whose frequency
+content is within the well-sampled range of the chosen <code class="docutils literal notranslate"><span class="pre">hop_length</span></code>.  For the CQT to
+be invertible at a given frequency <code class="docutils literal notranslate"><span class="pre">f</span></code>, the hop must satisfy
+<code class="docutils literal notranslate"><span class="pre">hop_length</span> <span class="pre">≤</span> <span class="pre">sr</span> <span class="pre">/</span> <span class="pre">(2</span> <span class="pre">*</span> <span class="pre">f</span> <span class="pre">/</span> <span class="pre">Q)</span></code> where <code class="docutils literal notranslate"><span class="pre">Q</span> <span class="pre">≈</span> <span class="pre">bins_per_octave</span> <span class="pre">/</span> <span class="pre">(2^(1/bins_per_octave)</span> <span class="pre">−</span> <span class="pre">1)</span></code>.
+Wideband signals (e.g. a full-range chirp) with a large <code class="docutils literal notranslate"><span class="pre">hop_length</span></code> will have reduced
+SNR because high-frequency bins are Nyquist-undersampled in time.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">nnAudio2.features.cqt</span><span class="w"> </span><span class="kn">import</span> <span class="n">CQT1992v2</span><span class="p">,</span> <span class="n">iCQT</span>
+
+<span class="n">cqt</span>  <span class="o">=</span> <span class="n">CQT1992v2</span><span class="p">(</span><span class="n">sr</span><span class="o">=</span><span class="mi">22050</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;Complex&#39;</span><span class="p">)</span>
+<span class="n">icqt</span> <span class="o">=</span> <span class="n">iCQT</span><span class="p">(</span><span class="n">sr</span><span class="o">=</span><span class="mi">22050</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+
+<span class="n">X</span>           <span class="o">=</span> <span class="n">cqt</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>                        <span class="c1"># [B, n_bins, T, 2]</span>
+<span class="n">waveform_hat</span> <span class="o">=</span> <span class="n">icqt</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># [B, T]</span>
+</pre></div>
+</div>
+<p>The input must be the <code class="docutils literal notranslate"><span class="pre">'Complex'</span></code> output of <code class="docutils literal notranslate"><span class="pre">CQT1992v2</span></code> with
+<code class="docutils literal notranslate"><span class="pre">normalization_type='librosa'</span></code> (the default). Magnitude-only CQT discards
+phase information, so exact reconstruction from magnitude alone is not possible.</p>
 <p>Step-by-step walkthroughs are available in the <code class="docutils literal notranslate"><span class="pre">tutorials/</span></code> folder of the repository:</p>
 <ul class="simple">
 <li><p><strong>Part 1</strong> — computing Mel spectrograms with nnAudio2</p></li>
@@ -241,6 +266,7 @@ to <a class="reference internal" href="_autosummary/nnAudio2.features.mel.MelSpe
 <p>The figure below shows how the STFT output is affected by changes to the learned basis.
 Notice the subtle difference for the trained STFT.</p>
 <img alt="STFT output before and after training" class="align-center" src="_images/STFT_training.png" />
+</section>
 </section>
 <section id="cqt-variants">
 <h1>CQT variants<a class="headerlink" href="#cqt-variants" title="Link to this heading"></a></h1>

@@ -1,0 +1,23 @@
+nnAudio2.features.cqt.iCQT
+==========================
+
+.. currentmodule:: nnAudio2.features.cqt
+
+.. autoclass:: iCQT
+   :members:
+   :show-inheritance:
+   :no-inherited-members:
+   :special-members: __call__, __add__, __mul__
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :nosignatures:
+   
+      ~iCQT.__init__
+      ~iCQT.extra_repr
+      ~iCQT.forward
+   
+   

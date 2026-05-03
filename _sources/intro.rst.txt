@@ -156,6 +156,32 @@ STFT, Mel, and CQT kernels can all be made trainable. Pass ``trainable=True`` to
 to :func:`~nnAudio2.features.mel.MelSpectrogram`, or ``trainable=True`` to
 :func:`~nnAudio2.features.cqt.CQT`.
 
+Invertible CQT
+--------------
+
+:func:`~nnAudio2.features.cqt.iCQT` reconstructs a waveform from the complex output of
+:func:`~nnAudio2.features.cqt.CQT1992v2`. It uses iterative Landweber inversion and is
+fully differentiable. Reconstruction SNR exceeds 30 dB for signals whose frequency
+content is within the well-sampled range of the chosen ``hop_length``.  For the CQT to
+be invertible at a given frequency ``f``, the hop must satisfy
+``hop_length ≤ sr / (2 * f / Q)`` where ``Q ≈ bins_per_octave / (2^(1/bins_per_octave) − 1)``.
+Wideband signals (e.g. a full-range chirp) with a large ``hop_length`` will have reduced
+SNR because high-frequency bins are Nyquist-undersampled in time.
+
+.. code-block:: python
+
+    from nnAudio2.features.cqt import CQT1992v2, iCQT
+
+    cqt  = CQT1992v2(sr=22050, hop_length=512, output_format='Complex')
+    icqt = iCQT(sr=22050, hop_length=512)
+
+    X           = cqt(waveform)                        # [B, n_bins, T, 2]
+    waveform_hat = icqt(X, length=waveform.shape[-1])  # [B, T]
+
+The input must be the ``'Complex'`` output of ``CQT1992v2`` with
+``normalization_type='librosa'`` (the default). Magnitude-only CQT discards
+phase information, so exact reconstruction from magnitude alone is not possible.
+
 Step-by-step walkthroughs are available in the ``tutorials/`` folder of the repository:
 
 - **Part 1** — computing Mel spectrograms with nnAudio2
