@@ -31,7 +31,7 @@ pip install git+https://github.com/AMAAI-Lab/nnAudio2.git#subdirectory=Installat
 | STFT | ✅ | ✅ | ✅ (uniform bin only) |
 | Mel Spectrogram | ✅ | ✅ | — |
 | MFCC | ✅ | ✅ | — |
-| CQT | ✅ | ✅ | — |
+| CQT | ✅ | ✅ | ✅ (CQT1992v2 only, see note) |
 | VQT | ✅ | ✅ | — |
 | Gammatone | ✅ | ✅ | — |
 | CFP | ✅ | ✅ | — |
@@ -40,6 +40,8 @@ pip install git+https://github.com/AMAAI-Lab/nnAudio2.git#subdirectory=Installat
 All transforms run on **CUDA**, **MPS (Apple Silicon)**, and **CPU**.
 
 > **Note on inverse STFT:** reliable reconstruction is only guaranteed for the uniform-bin setting (`freq_scale='no'`). Non-uniform variants (`linear`, `log`, `log2`) are analysis-only; attempting inversion raises an explicit error.
+
+> **Note on inverse CQT:** `iCQT` uses iterative Landweber inversion and achieves > 30 dB SNR for signals whose frequency content is within the Nyquist-sampled range of the chosen `hop_length`. Specifically, reconstruction is reliable up to roughly `f < sr / (2 * hop_length / Q)` where `Q ≈ bins_per_octave / (2^(1/bins_per_octave) − 1)`. At `hop_length=512` with default settings, this corresponds to frequencies below ~880 Hz. Wideband signals with a large `hop_length` will have reduced SNR because high-frequency bins are undersampled in time.
 
 ---
 

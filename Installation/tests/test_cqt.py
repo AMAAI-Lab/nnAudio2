@@ -268,6 +268,60 @@ def test_cqt_2010_v2_linear(device):
     assert np.allclose(X.cpu(), ground_truth, rtol=1e-2, atol=1e-2)
 
 
+@pytest.mark.parametrize("device", [*device_args])
+def test_icqt_roundtrip(device):
+    """iCQT round-trip SNR should exceed 30 dB for a tone within the CQT's representable range.
+
+    hop_length=512 with n_bins=84 is undercomplete for signals above ~880 Hz
+    (the CQT output has fewer values than the input for a full-bandwidth signal).
+    A 440 Hz pure tone stays well within the well-sampled low-frequency region
+    and is a valid benchmark for the reconstruction quality.
+    """
+    fs = 44100
+    s = np.linspace(0, 1, fs)
+    x = np.sin(2 * np.pi * 440 * s).astype(np.float32)
+    x_t = torch.tensor(x, device=device).unsqueeze(0)  # [1, T]
+
+    cqt  = CQT1992v2(sr=fs, fmin=55, n_bins=84, bins_per_octave=12,
+                     hop_length=512, output_format="Complex", verbose=False).to(device)
+    icqt = iCQT(sr=fs, fmin=55, n_bins=84, bins_per_octave=12,
+                hop_length=512, verbose=False).to(device)
+
+    X     = cqt(x_t)
+    x_hat = icqt(X, length=x_t.shape[-1])
+
+    signal_power = (x_t ** 2).mean()
+    noise_power  = ((x_t - x_hat) ** 2).mean()
+    snr = 10 * torch.log10(signal_power / (noise_power + 1e-12))
+    assert snr.item() > 30.0, f"iCQT round-trip SNR = {snr.item():.1f} dB, expected > 30 dB"
+
+
+@pytest.mark.parametrize("device", [*device_args])
+def test_icqt_output_shape(device):
+    """iCQT output shape must match (batch, length)."""
+    x = torch.randn(2, 16000, device=device)
+    cqt  = CQT1992v2(sr=16000, hop_length=256, n_bins=48,
+                     output_format="Complex", verbose=False).to(device)
+    icqt = iCQT(sr=16000, hop_length=256, n_bins=48, verbose=False).to(device)
+    X     = cqt(x)
+    x_hat = icqt(X, length=16000)
+    assert x_hat.shape == (2, 16000), f"Expected (2, 16000), got {x_hat.shape}"
+
+
+@pytest.mark.parametrize("device", [*device_args])
+def test_icqt_gradient(device):
+    """Gradients must flow through iCQT."""
+    # fmin=220 keeps kernel_width small enough for a short signal
+    x = torch.randn(1, 8192, device=device)
+    cqt  = CQT1992v2(sr=22050, fmin=220, n_bins=48, output_format="Complex", verbose=False).to(device)
+    icqt = iCQT(sr=22050, fmin=220, n_bins=48, verbose=False).to(device)
+    X = cqt(x).detach().requires_grad_(True)
+    x_hat = icqt(X, length=8192)
+    x_hat.sum().backward()
+    assert X.grad is not None
+    assert not torch.all(X.grad == 0)
+
+
 if torch.cuda.is_available():
     x = torch.randn((4, 44100)).to(
         f"cuda:{gpu_idx}"

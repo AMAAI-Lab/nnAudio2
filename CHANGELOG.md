@@ -13,7 +13,8 @@ Key changes:
 - **VQT correctness**: `VQT(gamma=0)` now explicitly delegates to `CQT1992v2`, aligning its output with CQT behavior.
 - **Citation reminder**: `import nnAudio2` shows a citation reminder by default; suppress with `NNAUDIO_DISABLE_CITATION_REMINDER=1`.
 - **Dependency baseline**: Python ≥ 3.11, PyTorch ≥ 2.0, NumPy 2.x, current SciPy.
-- **Test suite**: 57 tests pass in the modern environment; new regression tests cover TorchScript compilation and iSTFT rejection behavior.
+- **Inverse CQT (`iCQT`)**: new `nn.Module` that reconstructs a waveform from the `'Complex'` output of `CQT1992v2` using iterative Landweber inversion. The upper frame bound is estimated via power iteration at initialisation; the step size is set to `1.8/B` for guaranteed convergence. The adjoint correctly handles `ReflectionPad1d` boundary folding to match the forward operator exactly. Reconstruction SNR exceeds 30 dB for signals within the Nyquist-sampled frequency range of the chosen `hop_length` (see documentation for the constraint). The module is fully differentiable.
+- **Test suite**: 60 tests pass in the modern environment; new regression tests cover TorchScript compilation, iSTFT rejection behavior, and iCQT round-trip SNR, output shape, and gradient flow.
 
 For a full technical summary of what changed and why, see [MIGRATION_SUMMARY.md](MIGRATION_SUMMARY.md).  
 For the detailed development log (per-batch changes, before/after test results), see [MIGRATION_LOG.md](MIGRATION_LOG.md).

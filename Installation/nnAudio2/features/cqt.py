@@ -1143,3 +1143,266 @@ class CQT(CQT1992v2):
     """An abbreviation for :func:`~nnAudio.Spectrogram.CQT1992v2`. Please refer to the :func:`~nnAudio.Spectrogram.CQT1992v2` documentation"""
 
     pass
+
+
+class iCQT(nn.Module):
+    """Inverse Constant-Q Transform via Landweber iteration.
+
+    Reconstructs a waveform from the complex CQT output of
+    :func:`~nnAudio2.features.cqt.CQT1992v2` using iterative Landweber
+    inversion.  Reconstruction SNR exceeds 30 dB for signals whose frequency
+    content is within the well-sampled range of the CQT (roughly
+    ``f < sr / (2 * hop_length)`` per bin).  High-frequency content in
+    undercomplete configurations (``hop_length > 2 * n_bins``) cannot be
+    recovered.
+
+    All hyper-parameters must match the :func:`~nnAudio2.features.cqt.CQT1992v2`
+    that produced the CQT being inverted.
+
+    Parameters
+    ----------
+    sr : int
+        Sample rate. Default 22050.
+    hop_length : int
+        Hop size used during analysis. Default 512.
+    fmin : float
+        Lowest CQT frequency in Hz. Default 32.70 (C0).
+    fmax : float or None
+        Highest CQT frequency. Default ``None`` (derived from ``n_bins``).
+    n_bins : int
+        Total number of CQT bins. Default 84.
+    bins_per_octave : int
+        Bins per octave. Default 12.
+    filter_scale : float
+        Filter scale factor. Default 1.
+    norm : int
+        Kernel normalisation (1 = L1, 2 = L2). Default 1.
+    window : str
+        Window function. Default ``'hann'``.
+    center : bool
+        Whether the analysis used centre-padding. Must match the
+        ``CQT1992v2`` setting. Default ``True``.
+    pad_mode : str
+        Padding mode. Must match the ``CQT1992v2`` setting. Default
+        ``'reflect'``.
+    n_iter : int
+        Number of Landweber iterations. Default 32.
+    verbose : bool
+        Print kernel-creation progress. Default ``True``.
+
+    Input
+    -----
+    CQT : torch.Tensor, shape ``(batch, n_bins, time_steps, 2)``
+        Complex CQT from ``CQT1992v2(output_format='Complex',
+        normalization_type='librosa')``.
+    length : int or None
+        Original waveform length in samples. Providing this trims or
+        zero-pads the output to exactly the right number of samples.
+
+    Returns
+    -------
+    waveform : torch.Tensor, shape ``(batch, length)``
+
+    Examples
+    --------
+    >>> cqt  = CQT1992v2(sr=22050, hop_length=512, output_format='Complex')
+    >>> icqt = iCQT(sr=22050, hop_length=512)
+    >>> X    = cqt(waveform)
+    >>> waveform_hat = icqt(X, length=waveform.shape[-1])
+    """
+
+    def __init__(
+        self,
+        sr=22050,
+        hop_length=512,
+        fmin=32.70,
+        fmax=None,
+        n_bins=84,
+        bins_per_octave=12,
+        filter_scale=1,
+        norm=1,
+        window="hann",
+        center=True,
+        pad_mode="reflect",
+        n_iter=32,
+        verbose=True,
+    ):
+        super().__init__()
+
+        self.hop_length = hop_length
+        self.center = center
+        self.pad_mode = pad_mode
+        self.n_iter = n_iter
+
+        Q = float(filter_scale) / (2 ** (1 / bins_per_octave) - 1)
+
+        if verbose:
+            print("Creating iCQT kernels ...", end="\r")
+        start = time()
+
+        cqt_kernels, self.kernel_width, lengths, freqs = create_cqt_kernels(
+            Q, sr, fmin, n_bins, bins_per_octave, norm, window, fmax
+        )
+
+        self.register_buffer("lengths", lengths)
+        self.frequencies = freqs
+
+        # [n_bins, 1, kernel_width] — same layout as CQT1992v2
+        cqt_kernels_real = torch.tensor(cqt_kernels.real).unsqueeze(1)
+        cqt_kernels_imag = torch.tensor(cqt_kernels.imag).unsqueeze(1)
+        self.register_buffer("cqt_kernels_real", cqt_kernels_real)
+        self.register_buffer("cqt_kernels_imag", cqt_kernels_imag)
+
+        # Estimate upper frame bound B via power iteration on a probe signal.
+        # Landweber converges for alpha < 2/B; we use alpha = 1.8/B.
+        with torch.no_grad():
+            probe_len = 8 * self.kernel_width
+            v = torch.randn(1, probe_len)
+            for _ in range(20):
+                Av = self._analysis(v)
+                AAv = self._adjoint(Av, probe_len)
+                nrm = float(AAv.norm())
+                if nrm == 0.0:
+                    break
+                v = AAv / nrm
+            Av = self._analysis(v)
+            AAv = self._adjoint(Av, probe_len)
+            B_frame = max(float(AAv.norm()), 1e-6)
+
+        self.register_buffer("alpha", torch.tensor(1.8 / B_frame))
+
+        if verbose:
+            print(
+                "iCQT kernels created, time used = {:.4f} seconds".format(
+                    time() - start
+                )
+            )
+
+    # ------------------------------------------------------------------
+    # Internal operators
+    # ------------------------------------------------------------------
+
+    def _analysis(self, x):
+        """Apply the CQT analysis operator A, matching CQT1992v2.
+
+        x : Tensor [B, L]  →  CQT : Tensor [B, n_bins, T, 2]
+        """
+        x = x.unsqueeze(1)  # [B, 1, L]
+        if self.center:
+            pad = self.kernel_width // 2
+            if self.pad_mode == "reflect":
+                x = torch.nn.functional.pad(x, (pad, pad), mode="reflect")
+            else:
+                x = torch.nn.functional.pad(x, (pad, pad))
+        scale = torch.sqrt(self.lengths).view(1, -1, 1)
+        CQT_real = torch.nn.functional.conv1d(
+            x, self.cqt_kernels_real, stride=self.hop_length
+        ) * scale
+        CQT_imag = -torch.nn.functional.conv1d(
+            x, self.cqt_kernels_imag, stride=self.hop_length
+        ) * scale
+        return torch.stack([CQT_real, CQT_imag], dim=-1)  # [B, n_bins, T, 2]
+
+    def _adjoint(self, CQT_tensor, sig_len):
+        """Apply the adjoint A* of the analysis operator.
+
+        CQT_tensor : Tensor [B, n_bins, T, 2]  →  x : Tensor [B, sig_len]
+
+        The adjoint of ``A_r(x) = scale * conv(x, g_r)`` is
+        ``conv_transpose(· * scale, g_r)``, and the adjoint of
+        ``A_i(x) = -scale * conv(x, g_i)`` is
+        ``-conv_transpose(· * scale, g_i)``.  The adjoint of
+        ReflectionPad1d folds the boundary columns back into the interior.
+        """
+        CQT_real = CQT_tensor[..., 0]  # [B, n_bins, T]
+        CQT_imag = CQT_tensor[..., 1]
+        scale = torch.sqrt(self.lengths).view(1, -1, 1)
+
+        # Adjoint of the strided convolution (in padded-signal space)
+        adj_conv = (
+            torch.nn.functional.conv_transpose1d(
+                CQT_real * scale, self.cqt_kernels_real, stride=self.hop_length
+            )
+            + torch.nn.functional.conv_transpose1d(
+                -CQT_imag * scale, self.cqt_kernels_imag, stride=self.hop_length
+            )
+        )  # [B, 1, (T-1)*hop + kernel_width]
+
+        if self.center:
+            pad = self.kernel_width // 2
+            needed = sig_len + 2 * pad
+            cur = adj_conv.shape[-1]
+            if cur < needed:
+                adj_conv = torch.nn.functional.pad(adj_conv, (0, needed - cur))
+            elif cur > needed:
+                adj_conv = adj_conv[..., :needed]
+
+            if self.pad_mode == "reflect":
+                # Adjoint of ReflectionPad1d(pad):
+                #   direct:        x[k]           += y[pad + k]      for k in [0, L)
+                #   left reflect:  x[pad - j]     += y[j]            for j in [0, pad)
+                #                  i.e. x[1:pad+1] += y[0:pad].flip()
+                #   right reflect: x[L - 2 - k]   += y[pad + L + k]  for k in [0, pad)
+                #                  i.e. x[L-1-pad:L-1] += y[pad+L:pad+L+pad].flip()
+                L = sig_len
+                x = adj_conv[..., pad:pad + L].clone()
+                if pad > 0:
+                    x[..., 1:pad + 1] = (
+                        x[..., 1:pad + 1] + adj_conv[..., :pad].flip(-1)
+                    )
+                    x[..., L - 1 - pad:L - 1] = (
+                        x[..., L - 1 - pad:L - 1]
+                        + adj_conv[..., pad + L:pad + L + pad].flip(-1)
+                    )
+            else:
+                x = adj_conv[..., pad:pad + sig_len]
+        else:
+            cur = adj_conv.shape[-1]
+            if cur < sig_len:
+                adj_conv = torch.nn.functional.pad(adj_conv, (0, sig_len - cur))
+            x = adj_conv[..., :sig_len]
+
+        return x.squeeze(1)  # [B, sig_len]
+
+    # ------------------------------------------------------------------
+    # Forward
+    # ------------------------------------------------------------------
+
+    def forward(self, CQT, length=None):
+        """Reconstruct a waveform from a complex CQT spectrogram.
+
+        Parameters
+        ----------
+        CQT : torch.Tensor, shape ``(batch, n_bins, time_steps, 2)``
+            Complex CQT from ``CQT1992v2(output_format='Complex',
+            normalization_type='librosa')``.
+        length : int, optional
+            Original waveform length. Used to set the reconstruction target
+            length; output is trimmed or zero-padded to match.
+
+        Returns
+        -------
+        waveform : torch.Tensor, shape ``(batch, length)``
+        """
+        T = CQT.shape[2]
+        sig_len = length if length is not None else (T - 1) * self.hop_length + 1
+
+        x_hat = torch.zeros(
+            CQT.shape[0], sig_len,
+            device=CQT.device, dtype=self.cqt_kernels_real.dtype,
+        )
+
+        for _ in range(self.n_iter):
+            residual = CQT - self._analysis(x_hat)
+            x_hat = x_hat + self.alpha * self._adjoint(residual, sig_len)
+
+        if length is not None:
+            if x_hat.shape[-1] > length:
+                x_hat = x_hat[:, :length]
+            elif x_hat.shape[-1] < length:
+                x_hat = torch.nn.functional.pad(x_hat, (0, length - x_hat.shape[-1]))
+
+        return x_hat
+
+    def extra_repr(self) -> str:
+        return "CQT kernel size = {}".format((*self.cqt_kernels_real.shape,))
