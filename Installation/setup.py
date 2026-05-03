@@ -1,85 +1,31 @@
 import setuptools
-import codecs
 import os.path
-import sys
 
-from setuptools.command.develop import develop
-
-try:
-    from setuptools.command.editable_wheel import editable_wheel
-except ImportError:
-    editable_wheel = None
-
-try:
-    from wheel.bdist_wheel import bdist_wheel
-except ImportError:
-    bdist_wheel = None
-
-with open("README.md", "r") as fh:
+with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 
 def read(rel_path):
     here = os.path.abspath(os.path.dirname(__file__))
-    with codecs.open(os.path.join(here, rel_path), "r") as fp:
+    with open(os.path.join(here, rel_path), "r", encoding="utf-8") as fp:
         return fp.read()
 
 
 def get_metadata(rel_path):
     namespace = {}
-    original_disable_flag = os.environ.get("NNAUDIO_DISABLE_CITATION_REMINDER")
     os.environ["NNAUDIO_DISABLE_CITATION_REMINDER"] = "1"
     try:
         exec(read(rel_path), namespace)
     finally:
-        if original_disable_flag is None:
-            os.environ.pop("NNAUDIO_DISABLE_CITATION_REMINDER", None)
-        else:
-            os.environ["NNAUDIO_DISABLE_CITATION_REMINDER"] = original_disable_flag
+        os.environ.pop("NNAUDIO_DISABLE_CITATION_REMINDER", None)
     return namespace
 
 
 PACKAGE_METADATA = get_metadata("nnAudio2/__init__.py")
-_CITATION_REMINDER = PACKAGE_METADATA["_CITATION_REMINDER"]
-
-
-def emit_citation_reminder():
-    sys.stderr.write(_CITATION_REMINDER + "\n")
-
-
-class CitationReminderDevelop(develop):
-    def run(self):
-        super().run()
-        emit_citation_reminder()
-
-
-cmdclass = {
-    "develop": CitationReminderDevelop,
-}
-
-
-if editable_wheel is not None:
-    class CitationReminderEditableWheel(editable_wheel):
-        def run(self):
-            super().run()
-            emit_citation_reminder()
-
-
-    cmdclass["editable_wheel"] = CitationReminderEditableWheel
-
-
-if bdist_wheel is not None:
-    class CitationReminderBdistWheel(bdist_wheel):
-        def run(self):
-            super().run()
-            emit_citation_reminder()
-
-
-    cmdclass["bdist_wheel"] = CitationReminderBdistWheel
 
 
 setuptools.setup(
-    name="nnaudio2",  # Replace with your own username
+    name="nnaudio2",
     version=PACKAGE_METADATA["__version__"],
     author="AMAAI Lab",
     author_email="dorien.herremans@gmail.com",
@@ -96,7 +42,7 @@ setuptools.setup(
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
+        "Operating System :: OS Compatible",
     ],
     python_requires=">=3.8",
     install_requires=[
@@ -105,5 +51,4 @@ setuptools.setup(
         "torch>=1.6.0",
     ],
     extras_require={"tests": ["pytest", "librosa"]},
-    cmdclass=cmdclass,
 )
