@@ -1,6 +1,6 @@
 import os
 
-__version__ = "2.0.0"
+__version__ = "2.0.1"
 
 __citation__ = (
     'Roy et al. (2026) nnAudio 2, arXiv. '
