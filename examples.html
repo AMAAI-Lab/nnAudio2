@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PyTorch Template for Audio projects &mdash; 2.0.0</title>
+  <title>Tutorials &mdash; 2.0.0</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
@@ -47,10 +47,11 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro.html#requirements">Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro.html#usage">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro.html#speed">Speed</a></li>
-<li class="toctree-l1"><a class="reference internal" href="intro.html#trainable-kernals">Trainable kernals</a></li>
-<li class="toctree-l1"><a class="reference internal" href="intro.html#different-cqt-versions">Different CQT versions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro.html#trainable-kernels">Trainable kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro.html#cqt-variants">CQT variants</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
@@ -58,9 +59,9 @@
 <li class="toctree-l1"><a class="reference internal" href="_autosummary/nnAudio2.librosa_functions.html">nnAudio2.librosa_functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="_autosummary/nnAudio2.utils.html">nnAudio2.utils</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<p class="caption" role="heading"><span class="caption-text">Examples &amp; Tutorials</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">PyTorch Template for Audio projects</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorials</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">GitHub</span></p>
 <ul>
@@ -68,7 +69,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Citation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="citing.html">Citing nnAudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citing.html">Citation</a></li>
 </ul>
 
         </div>
@@ -85,7 +86,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">PyTorch Template for Audio projects</li>
+      <li class="breadcrumb-item active">Tutorials</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/examples.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -95,10 +96,42 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="id1">
-<h1><a class="reference external" href="https://github.com/KinWaiCheuk/pytorch_template">PyTorch Template for Audio projects</a><a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
-<p>I am building a pytorch template which allows audio related projects to be quick setup.
-This <a class="reference external" href="https://github.com/KinWaiCheuk/pytorch_template">template</a> uses nnAudio to extract spectrograms on-the-fly.</p>
+  <section id="tutorials">
+<h1>Tutorials<a class="headerlink" href="#tutorials" title="Link to this heading"></a></h1>
+<p>Step-by-step tutorials are available in the <code class="docutils literal notranslate"><span class="pre">tutorials/</span></code> folder of the
+<a class="reference external" href="https://github.com/AMAAI-Lab/nnAudio2">nnAudio2 repository</a>.
+Each tutorial is a self-contained Jupyter notebook that can be run locally.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 10.0%" />
+<col style="width: 90.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>Part 1</strong></p></td>
+<td><p><em>Computing Mel spectrograms with nnAudio2</em> — loading audio, initialising
+the <code class="docutils literal notranslate"><span class="pre">MelSpectrogram</span></code> layer, and visualising the output.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Part 2</strong></p></td>
+<td><p><em>Training a linear keyword spotter with trainable basis functions</em> — embedding
+nnAudio2 inside a <code class="docutils literal notranslate"><span class="pre">LightningModule</span></code>, enabling <code class="docutils literal notranslate"><span class="pre">trainable_mel</span></code> and
+<code class="docutils literal notranslate"><span class="pre">trainable_STFT</span></code>, and training on Google Speech Commands.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Part 3</strong></p></td>
+<td><p><em>Evaluation and visualisation</em> — loading a saved checkpoint, running the test
+set, and plotting the learned Mel filterbank and STFT kernels.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Part 4</strong></p></td>
+<td><p><em>Using more complex non-linear models</em> — swapping the linear classifier for a
+BC-ResNet while keeping the nnAudio2 front-end unchanged.</p></td>
+</tr>
+</tbody>
+</table>
+<p>To run the tutorials, install the dependencies listed in <code class="docutils literal notranslate"><span class="pre">tutorials/requirements.txt</span></code>
+and open the notebooks in Jupyter:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>tutorials/requirements.txt
+jupyter<span class="w"> </span>notebook<span class="w"> </span>tutorials/
+</pre></div>
+</div>
 </section>
 
 

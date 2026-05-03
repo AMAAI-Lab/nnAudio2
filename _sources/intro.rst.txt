@@ -1,209 +1,195 @@
-
 Introduction
-************
+============
 
-nnAudio2 is basically a GPU version of some of the librosa functions, with additional features such as differentiable and trainable. The figure below shows the spectrograms obtained by nnAudio2 and librosa using different input signals.
+nnAudio2 implements audio feature extraction as differentiable PyTorch ``nn.Module`` layers.
+Transforms such as STFT, Mel spectrogram, MFCC, CQT, VQT, and Gammatone run on GPU (CUDA
+or MPS) or CPU and can be embedded directly inside a neural network. Because the kernels are
+``nn.Parameter`` tensors, filter banks can optionally be made **trainable** — optimised
+end-to-end alongside the rest of the model.
+
+The figure below compares spectrograms produced by nnAudio2 and librosa for the same input.
 
 .. image:: ../../figures/performance_1.png
     :align: center
-    :alt: Speed test across different machines
+    :alt: Spectrogram comparison — nnAudio2 vs librosa
 
 .. image:: ../../figures/performance_2.png
     :align: center
-    :alt: Speed test across different machines
+    :alt: Spectrogram comparison — nnAudio2 vs librosa
 
 
 Installation
-************
+============
 
 Via PyPI
-~~~~~~~~
-To install previous releases from pypi: ``pip install nnAudio==x.x.x``, where ``x.x.x`` is the version number.
-The lastest version might not be always available in PyPI, in this case, please install the lastest version from github. 
+--------
+
+.. code-block:: bash
+
+    pip install nnaudio2
 
 Via GitHub
-~~~~~~~~~~
-To install the lastest version from github, you can do ``pip install git+https://github.com/AMAAI-Lab/nnAudio2.git#subdirectory=Installation``.
+----------
 
-Alternatively, you can also install from the github manually by the following steps:
+.. code-block:: bash
 
-1. Clone the repository with ``git clone https://github.com/AMAAI-Lab/nnAudio2.git <any path you want to save to>``
+    pip install git+https://github.com/AMAAI-Lab/nnAudio2.git#subdirectory=Installation
 
-2. ``cd`` into the ``Installation`` folder where the ``setup.py`` is located at
+Or install manually:
 
-3. ``python setup.py install``.
+1. ``git clone https://github.com/AMAAI-Lab/nnAudio2.git``
+2. ``cd nnAudio2/Installation``
+3. ``pip install .``
 
 
-Requirement
-~~~~~~~~~~~
+Requirements
+============
 
-Numpy >= 1.14.5, < 2.0
+- Python ≥ 3.11
+- PyTorch ≥ 2.0
+- NumPy ≥ 1.14.5
+- SciPy ≥ 1.2.0
 
-Scipy >= 1.2.0
 
-PyTorch >= 1.6.0 (Griffin-Lim only available after 1.6.0)
+Usage
+=====
 
-Python >= 3.8
+Standalone
+----------
 
-librosa = 0.7.0 (Theortically nnAudio2 depends on librosa. But we only need to use a single function mel from librosa.filters. To save users troubles from installing librosa for this single function, I just copy the chunk of functions corresponding to mel in my code so that nnAudio2 runs without the need to install librosa)
-
-Usage 
-*****
-
-Standalone Usage
-~~~~~~~~~~~~~~~~
-To use nnAudio2, you need to define the spectrogram layer in the same way as a neural network layer.
-After that, you can pass a batch of waveform to that layer to obtain the spectrograms.
-The input shape should be `(batch, len_audio)`.
+Import the specific transform you need and initialise it like any other ``nn.Module``.
+The input shape is ``(batch, samples)``.
 
 .. code-block:: python
 
-    from nnAudio2 import features
-    from scipy.io import wavfile
     import torch
-    sr, song = wavfile.read('./Bach.wav') # Loading your audio
-    x = song.mean(1) # Converting Stereo  to Mono
-    x = torch.tensor(x, device='cuda:0').float() # casting the array into a PyTorch Tensor
+    import torchaudio
+    from nnAudio2.features.mel import MelSpectrogram
 
-    spec_layer = features.STFT(n_fft=2048, freq_bins=None, hop_length=512, 
-                                  window='hann', freq_scale='linear', center=True, pad_mode='reflect', 
-                                  fmin=50,fmax=11025, sr=sr) # Initializing the model
+    waveform, sr = torchaudio.load('audio.wav')      # [channels, samples]
+    waveform = waveform.mean(0, keepdim=True)         # mono, [1, samples]
 
-    spec = spec_layer(x) # Feed-forward your waveform to get the spectrogram      
+    mel = MelSpectrogram(sr=sr, n_fft=1024, hop_length=512, n_mels=128)
+    spec = mel(waveform)                              # [1, 128, T]
 
-For inverse STFT, use the standard uniform-bin configuration with ``freq_scale='no'``. The non-uniform ``linear``, ``log``, and ``log2`` frequency scales should be treated as analysis-only.
-    
- 
-.. _on-the-fly: 
- 
-On-the-fly audio processing
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-By integrating nnAudio2 inside your neural network, it can be used as on-the-fly spectrogram extracting. Here is one example on how to put nnAudio2 inside your neural network (highlighted in yellow):
+For an STFT:
 
 .. code-block:: python
-    :emphasize-lines: 10-15,32
-    
-    from nnAudio2 import features
+
+    from nnAudio2.features.stft import STFT
+
+    stft = STFT(n_fft=2048, hop_length=512, freq_scale='no', sr=22050,
+                output_format='Magnitude')
+    spec = stft(waveform)
+
+
+.. _on-the-fly:
+
+On-the-fly processing inside a neural network
+---------------------------------------------
+
+Because nnAudio2 transforms are standard ``nn.Module`` objects, they can be placed
+anywhere in a model. The transform moves to the correct device automatically when
+you call ``model.to(device)``.
+
+.. code-block:: python
+    :emphasize-lines: 8-12
+
     import torch
-    import torch.nn as nn    
-    
-    class Model(torch.nn.Module):
-        def __init__(self, n_fft, output_dim):
+    import torch.nn as nn
+    from nnAudio2.features.mel import MelSpectrogram
+
+    class KeywordSpotter(nn.Module):
+        def __init__(self, n_mels=64, output_dim=12):
             super().__init__()
-            self.epsilon=1e-10
-            # Getting Mel Spectrogram on the fly
-            self.spec_layer = features.STFT(n_fft=n_fft, freq_bins=None,
-                                               hop_length=512, window='hann',
-                                               freq_scale='no', center=True,
-                                               pad_mode='reflect', fmin=50,
-                                               fmax=6000, sr=22050, trainable=False,
-                                               output_format='Magnitude')
-            self.n_bins = n_fft//2
+            self.mel = MelSpectrogram(
+                sr=16000, n_fft=480, hop_length=160,
+                n_mels=n_mels, fmin=0.0, norm=1,
+                trainable_mel=True, trainable_STFT=True,
+            )
+            self.classifier = nn.Linear(n_mels * 101, output_dim)
 
-            # Creating CNN Layers
-            self.CNN_freq_kernel_size=(128,1)
-            self.CNN_freq_kernel_stride=(2,1)
-            k_out = 128
-            k2_out = 256
-            self.CNN_freq = nn.Conv2d(1,k_out,
-                                    kernel_size=self.CNN_freq_kernel_size,stride=self.CNN_freq_kernel_stride)
-            self.CNN_time = nn.Conv2d(k_out,k2_out,
-                                    kernel_size=(1,3),stride=(1,1))
+        def forward(self, x):                       # x: [B, 16000]
+            spec = torch.log(self.mel(x) + 1e-10)  # [B, n_mels, T]
+            return self.classifier(spec.flatten(1))
 
-            self.region_v = 1 + (self.n_bins-self.CNN_freq_kernel_size[0])//self.CNN_freq_kernel_stride[0]
-            self.linear = torch.nn.Linear(k2_out*self.region_v, output_dim, bias=False)
+    model = KeywordSpotter().to('cuda')
+    audio = torch.randn(8, 16000).to('cuda')
+    logits = model(audio)                           # [8, 12]
 
-        def forward(self,x):
-            z = self.spec_layer(x)
-            z = torch.log(z+self.epsilon)
-            z2 = torch.relu(self.CNN_freq(z.unsqueeze(1)))
-            z3 = torch.relu(self.CNN_time(z2)).mean(-1)
-            y = self.linear(torch.relu(torch.flatten(z3,1)))
-            return torch.sigmoid(y)
-            
-After that, your model can take waveforms directly as the input, and extract spectrograms on-the-fly during feedforward.
+The model accepts raw waveforms directly; the spectrogram is computed on-the-fly
+during the forward pass.
 
-.. code-block:: python
-    :emphasize-lines: 2
 
-    waveforms = torch.randn(4,44100)
-    model(waveforms) # automatically convert waveforms into spectrograms
-            
-            
 Using GPU
-~~~~~~~~~
+---------
 
-If a GPU is available in your computer, you can use ``.to(device)`` method like any other PyTorch ``nn.Modules`` 
-to transfer the spectrogram layer to any device you like.
-
+All transforms support ``.to(device)`` exactly like any other PyTorch module.
 
 .. code-block:: python
 
-    spec_layer = features.STFT().to(device)
-    
-Alternatively, if your ``features`` module is used inside your PyTorch model 
-as in the :ref:`on-the-fly processing section<on-the-fly>`, then you just need 
-to simply do ``net.to(device)``, where ``net = Model()``.
+    mel = MelSpectrogram(sr=22050, n_fft=1024, hop_length=512, n_mels=128).to('cuda')
+
+On Apple Silicon, use ``device='mps'`` instead.
+
 
 Speed
-*****
+=====
 
-The speed test is conducted using three different machines, and it shows that nnAudio2 running on GPU is faster than most of the existing libraries.
+The speed test below was conducted on three different machines, demonstrating that
+nnAudio2 running on GPU outperforms most existing audio processing libraries.
 
-* Machine A: Windows Desktop with CPU: Intel Core i7-8700 @ 3.20GHz and GeForce GTX 1070 Ti 8Gb GPU
-
-* Machine B: Linux Desktop with CPU: AMD Ryzen 7 PRO 3700 and 1 GeForce RTX 2080 Ti 11Gb GPU
-
-* Machine C: DGX station with CPU: Intel Xeon E5-2698 v4 @ 2.20GHz and Tesla v100 32Gb GPU
+- **Machine A** — Windows desktop, Intel Core i7-8700 @ 3.20 GHz, GeForce GTX 1070 Ti 8 GB
+- **Machine B** — Linux desktop, AMD Ryzen 7 PRO 3700, GeForce RTX 2080 Ti 11 GB
+- **Machine C** — DGX station, Intel Xeon E5-2698 v4 @ 2.20 GHz, Tesla V100 32 GB
 
 .. image:: ../../figures/speedv3.png
     :align: center
-    :alt: Speed test across different machines
-    
-    
-Trainable kernals
-*****************
+    :alt: Speed comparison across machines
 
-Fourier basis in :func:`~nnAudio2.features.stft.STFT` can be set trainable by using ``trainable=True`` argument. Fourier basis in :func:`~nnAudio2.features.mel.MelSpectrogram` can be also set trainable by using `trainable_STFT=True`, and Mel filter banks can be set trainable using ``trainable_mel=False`` argument. The same goes for :func:`~nnAudio2.features.cqt.CQT`.
 
-The follow demonstrations are avaliable on Google colab.
+Trainable kernels
+=================
 
-* `Trainable STFT Kernel <https://colab.research.google.com/drive/12VwjKSuXFkXCQd1hr3KUZ2bqzFEe-O6L>`__
-* `Trainable Mel Kernel <https://colab.research.google.com/drive/1UtswBYWhVxDNBRDajWzyplZfMiqENCEF>`__
-* `Trainable CQT Kernel <https://colab.research.google.com/drive/1coH54dfjAOxEyOjJrqscQRyC0_lmF04s>`__
+STFT, Mel, and CQT kernels can all be made trainable. Pass ``trainable=True`` to
+:func:`~nnAudio2.features.stft.STFT`, or ``trainable_mel=True`` / ``trainable_STFT=True``
+to :func:`~nnAudio2.features.mel.MelSpectrogram`, or ``trainable=True`` to
+:func:`~nnAudio2.features.cqt.CQT`.
+
+Step-by-step walkthroughs are available in the ``tutorials/`` folder of the repository:
+
+- **Part 1** — computing Mel spectrograms with nnAudio2
+- **Part 2** — training a linear keyword spotter with trainable basis functions
+- **Part 3** — evaluating the model and visualising learned kernels
+- **Part 4** — replacing the linear classifier with a BC-ResNet
 
 The figure below shows the STFT basis before and after training.
 
 .. image:: ../../figures/Trained_basis.png
     :align: center
-    :alt: Trained_basis
-    
+    :alt: STFT basis before and after training
 
-The figure below shows how is the STFT output affected by the changes in STFT basis. Notice the subtle signal in the background for the trained STFT.
+The figure below shows how the STFT output is affected by changes to the learned basis.
+Notice the subtle difference for the trained STFT.
 
 .. image:: ../../figures/STFT_training.png
     :align: center
-    :alt: STFT_training
+    :alt: STFT output before and after training
 
 
-Different CQT versions
-**********************
+CQT variants
+============
 
-The result for ``CQT1992`` is smoother than ``CQT2010`` and librosa.
-Since librosa and ``CQT2010`` are using the same algorithm (downsampling approach as mentioned in this paper),
-you can see similar artifacts as a result of downsampling.
+``CQT1992v2`` (the default) computes the CQT directly in the time domain without
+transforming both the input and the kernels to the frequency domain, making it faster
+than the original 1992 algorithm.
 
-For ``CQT1992v2`` and ``CQT2010v2``, the CQT is computed directly in the time domain
-without the need of transforming both input waveforms and the CQT kernels to the frequency domain.
-making it faster than the original CQT proposed in 1992.
+``CQT2010`` uses the downsampling approach from the 2010 paper — the same algorithm
+as librosa — and produces similar artefacts as a result.
 
-The default CQT in nnAudio2 is the ``CQT1992v2`` version.
-For more detail, please refer to our `paper <https://ieeexplore.ieee.org/document/9174990>`__
-
-All versions of CQT are available for users to choose.
-To explicitly choose which CQT to use, you can refer to the :ref:`CQT API section<nnAudio2.features.cqt.CQT>`.
-
+For more detail, see the `paper <https://ieeexplore.ieee.org/document/9174990>`_.
+All CQT variants are accessible via :ref:`CQT API <nnAudio2.features.cqt.CQT>`.
 
 .. image:: ../../figures/CQT_compare.png
     :align: center
-    :alt: Comparing different versions of CQTs
+    :alt: Comparing different CQT versions
