@@ -182,6 +182,40 @@ The input must be the ``'Complex'`` output of ``CQT1992v2`` with
 ``normalization_type='librosa'`` (the default). Magnitude-only CQT discards
 phase information, so exact reconstruction from magnitude alone is not possible.
 
+Using iCQT in a trainable network
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Because ``iCQT`` is a standard ``nn.Module``, it can sit anywhere in a model and
+gradients flow through it automatically — for example as the decoder in a
+CQT-based autoencoder:
+
+.. code-block:: python
+
+    class CQTAutoencoder(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.encoder = CQT1992v2(sr=22050, hop_length=512,
+                                     output_format='Complex')
+            self.bottleneck = nn.Conv2d(1, 1, 3, padding=1)  # example
+            self.decoder = iCQT(sr=22050, hop_length=512)
+
+        def forward(self, x):
+            X = self.encoder(x)                      # [B, n_bins, T, 2]
+            X = self.bottleneck(X[..., 0].unsqueeze(1)).squeeze(1)
+            # rebuild complex tensor and decode ...
+            return self.decoder(X, length=x.shape[-1])
+
+**Important:** ``iCQT`` initialises its own internal copy of the CQT kernels
+for the Landweber iterations. If you also set ``trainable=True`` on
+``CQT1992v2``, those kernels will drift during training and the inversion
+quality will degrade. The recommended patterns are:
+
+1. **Keep the CQT frozen** (``trainable=False``, the default) and train only
+   the layers between encoder and decoder. The iCQT inversion stays accurate
+   throughout training.
+2. **Train the CQT kernels, then re-initialise iCQT** from the updated
+   parameters once training is complete, for offline reconstruction.
+
 Step-by-step walkthroughs are available in the ``tutorials/`` folder of the repository:
 
 - **Part 1** — computing Mel spectrograms with nnAudio2

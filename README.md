@@ -80,6 +80,7 @@ Full changelog: [CHANGELOG.md](CHANGELOG.md)
 
 **Migrating from nnAudio?** See [MIGRATION_SUMMARY.md](MIGRATION_SUMMARY.md) for a concise breakdown of every change, the reasoning behind each fix, and how to verify your environment.
 
+**v2.0.2** (May 2026) — adds `iCQT` (Landweber iterative inverse CQT).  
 **v2.0.0** (April 2026) — full overhaul of nnAudio. See the nnAudio2 paper for details.
 
 ---
@@ -137,7 +138,7 @@ A GitHub Actions workflow at `.github/workflows/publish-to-pypi.yml` publishes t
 1. Create a `pypi` environment in the GitHub repository settings and require manual approval.
 2. In PyPI, add a Trusted Publisher for `AMAAI-Lab / nnAudio2`, workflow `publish-to-pypi.yml`, environment `pypi`.
 3. Bump `__version__` in `Installation/nnAudio2/__init__.py` to match the tag.
-4. Push the tag: `git tag v2.0.1 && git push origin v2.0.1`.
+4. Push the tag: `git tag v2.0.2 && git push origin v2.0.2`.
 
 ---
 
