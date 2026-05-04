@@ -6,21 +6,21 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Introduction &mdash; 2.0.1</title>
+  <title>Introduction &mdash; 2.0.2</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=f5cff4aa"></script>
+      <script src="_static/documentation_options.js?v=c2377ec0"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="&lt;no title&gt;" href="nnAudio2.html" />
-    <link rel="prev" title="nnAudio2 2.0.1" href="index.html" /> 
+    <link rel="prev" title="nnAudio2 2.0.2" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -60,7 +60,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#speed">Speed</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#trainable-kernels">Trainable kernels</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#invertible-cqt">Invertible CQT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#invertible-cqt">Invertible CQT</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#using-icqt-in-a-trainable-network">Using iCQT in a trainable network</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#cqt-variants">CQT variants</a></li>
@@ -254,6 +257,37 @@ SNR because high-frequency bins are Nyquist-undersampled in time.</p>
 <p>The input must be the <code class="docutils literal notranslate"><span class="pre">'Complex'</span></code> output of <code class="docutils literal notranslate"><span class="pre">CQT1992v2</span></code> with
 <code class="docutils literal notranslate"><span class="pre">normalization_type='librosa'</span></code> (the default). Magnitude-only CQT discards
 phase information, so exact reconstruction from magnitude alone is not possible.</p>
+<section id="using-icqt-in-a-trainable-network">
+<h3>Using iCQT in a trainable network<a class="headerlink" href="#using-icqt-in-a-trainable-network" title="Link to this heading"></a></h3>
+<p>Because <code class="docutils literal notranslate"><span class="pre">iCQT</span></code> is a standard <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code>, it can sit anywhere in a model and
+gradients flow through it automatically — for example as the decoder in a
+CQT-based autoencoder:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">CQTAutoencoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">CQT1992v2</span><span class="p">(</span><span class="n">sr</span><span class="o">=</span><span class="mi">22050</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
+                                 <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;Complex&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottleneck</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># example</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">iCQT</span><span class="p">(</span><span class="n">sr</span><span class="o">=</span><span class="mi">22050</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>                      <span class="c1"># [B, n_bins, T, 2]</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bottleneck</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># rebuild complex tensor and decode ...</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<p><strong>Important:</strong> <code class="docutils literal notranslate"><span class="pre">iCQT</span></code> initialises its own internal copy of the CQT kernels
+for the Landweber iterations. If you also set <code class="docutils literal notranslate"><span class="pre">trainable=True</span></code> on
+<code class="docutils literal notranslate"><span class="pre">CQT1992v2</span></code>, those kernels will drift during training and the inversion
+quality will degrade. The recommended patterns are:</p>
+<ol class="arabic simple">
+<li><p><strong>Keep the CQT frozen</strong> (<code class="docutils literal notranslate"><span class="pre">trainable=False</span></code>, the default) and train only
+the layers between encoder and decoder. The iCQT inversion stays accurate
+throughout training.</p></li>
+<li><p><strong>Train the CQT kernels, then re-initialise iCQT</strong> from the updated
+parameters once training is complete, for offline reconstruction.</p></li>
+</ol>
 <p>Step-by-step walkthroughs are available in the <code class="docutils literal notranslate"><span class="pre">tutorials/</span></code> folder of the repository:</p>
 <ul class="simple">
 <li><p><strong>Part 1</strong> — computing Mel spectrograms with nnAudio2</p></li>
@@ -266,6 +300,7 @@ phase information, so exact reconstruction from magnitude alone is not possible.
 <p>The figure below shows how the STFT output is affected by changes to the learned basis.
 Notice the subtle difference for the trained STFT.</p>
 <img alt="STFT output before and after training" class="align-center" src="_images/STFT_training.png" />
+</section>
 </section>
 </section>
 <section id="cqt-variants">
@@ -284,7 +319,7 @@ All CQT variants are accessible via <a class="reference internal" href="_autosum
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="nnAudio2 2.0.1" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="nnAudio2 2.0.2" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="nnAudio2.html" class="btn btn-neutral float-right" title="&lt;no title&gt;" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
