@@ -54,7 +54,8 @@ nnAudio2 modernises the original library for current PyTorch and scientific Pyth
 - **CFP restored** — compatibility with modern SciPy is fixed.
 - **VQT correctness** — VQT now correctly reduces to CQT when `gamma = 0`.
 - **Modern dependencies** — tested against current PyTorch, NumPy 2.x, and SciPy releases.
-- **Expanded test suite** — regression tests cover new STFT/iSTFT behaviours; the full suite passes in a modern Python environment.
+- **Inverse CQT (`iCQT`)** — new differentiable `nn.Module` that reconstructs a waveform from the complex output of `CQT1992v2` via iterative Landweber inversion. Achieves > 30 dB SNR for signals within the Nyquist-sampled frequency range of the chosen `hop_length`. Fully compatible with `model.to(device)` and gradient flow.
+- **Expanded test suite** — regression tests cover new STFT/iSTFT behaviours and iCQT round-trip SNR; the full suite passes in a modern Python environment.
 
 ---
 
