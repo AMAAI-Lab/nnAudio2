@@ -124,6 +124,13 @@ set, and plotting the learned Mel filterbank and STFT kernels.</p></td>
 <td><p><em>Using more complex non-linear models</em> — swapping the linear classifier for a
 BC-ResNet while keeping the nnAudio2 front-end unchanged.</p></td>
 </tr>
+<tr class="row-odd"><td><p><strong>Part 5</strong></p></td>
+<td><p><em>Fast &amp; differentiable audio features with HuggingFace</em> — benchmarking librosa,
+torchaudio, and nnAudio2 on MPS/GPU; integrating <code class="docutils literal notranslate"><span class="pre">MelSpectrogram</span></code> as the first
+layer of a HuggingFace <code class="docutils literal notranslate"><span class="pre">Trainer</span></code>-compatible model; enabling <code class="docutils literal notranslate"><span class="pre">trainable_mel=True</span></code>
+and visualising filterbank adaptation. Demonstrates a <strong>+28 % relative accuracy
+improvement</strong> on Google Speech Commands v0.02 (35-class) over a fixed mel baseline.</p></td>
+</tr>
 </tbody>
 </table>
 <p>To run the tutorials, install the dependencies listed in <code class="docutils literal notranslate"><span class="pre">tutorials/requirements.txt</span></code>

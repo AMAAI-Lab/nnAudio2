@@ -121,6 +121,48 @@ The model accepts raw waveforms directly; the spectrogram is computed on-the-fly
 during the forward pass.
 
 
+HuggingFace Trainer integration
+--------------------------------
+
+Because nnAudio2 transforms are standard ``nn.Module`` objects, a model that wraps one
+is immediately compatible with the HuggingFace ``Trainer`` — no adapter or processor
+subclass is needed. The model should accept ``input_values`` (raw waveforms) and return
+a ``SequenceClassifierOutput``:
+
+.. code-block:: python
+
+    import torch.nn as nn
+    import torch.nn.functional as F
+    from nnAudio2.features.mel import MelSpectrogram
+    from transformers import Trainer, TrainingArguments
+    from transformers.modeling_outputs import SequenceClassifierOutput
+
+    class AudioClassifier(nn.Module):
+        def __init__(self, n_classes):
+            super().__init__()
+            # Trainable mel filterbank — optimised end-to-end with the rest of the model
+            self.mel  = MelSpectrogram(sr=16000, n_mels=64, trainable_mel=True)
+            self.head = nn.Linear(64, n_classes)
+
+        def forward(self, input_values, labels=None):
+            spec   = self.mel(input_values).mean(-1)   # [B, 64]
+            logits = self.head(spec)
+            loss   = F.cross_entropy(logits, labels) if labels is not None else None
+            return SequenceClassifierOutput(loss=loss, logits=logits)
+
+    trainer = Trainer(
+        model=AudioClassifier(35),
+        args=TrainingArguments(output_dir="./out", num_train_epochs=10),
+        train_dataset=...,   # yields {"input_values": waveform, "labels": label}
+    )
+    trainer.train()
+
+Gradients flow back through the mel filterbank at every step. For stable training of
+the filterbank, use a parameter group with a lower learning rate for ``model.mel``
+(e.g. 5 % of the CNN learning rate) and clamp ``mel_basis`` to non-negative values
+after each step. A complete example with these guard rails is in **Tutorial 5**.
+
+
 Using GPU
 ---------
 
@@ -222,6 +264,7 @@ Step-by-step walkthroughs are available in the ``tutorials/`` folder of the repo
 - **Part 2** — training a linear keyword spotter with trainable basis functions
 - **Part 3** — evaluating the model and visualising learned kernels
 - **Part 4** — replacing the linear classifier with a BC-ResNet
+- **Part 5** — speed benchmarks, HuggingFace ``Trainer`` integration, and learnable mel filterbanks (+28 % accuracy on Speech Commands)
 
 The figure below shows the STFT basis before and after training.
 

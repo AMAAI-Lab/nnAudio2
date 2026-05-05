@@ -55,6 +55,7 @@
 <li class="toctree-l1"><a class="reference internal" href="#usage">Usage</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#standalone">Standalone</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#on-the-fly-processing-inside-a-neural-network">On-the-fly processing inside a neural network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#huggingface-trainer-integration">HuggingFace Trainer integration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#using-gpu">Using GPU</a></li>
 </ul>
 </li>
@@ -209,6 +210,44 @@ you call <code class="docutils literal notranslate"><span class="pre">model.to(d
 <p>The model accepts raw waveforms directly; the spectrogram is computed on-the-fly
 during the forward pass.</p>
 </section>
+<section id="huggingface-trainer-integration">
+<h2>HuggingFace Trainer integration<a class="headerlink" href="#huggingface-trainer-integration" title="Link to this heading"></a></h2>
+<p>Because nnAudio2 transforms are standard <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> objects, a model that wraps one
+is immediately compatible with the HuggingFace <code class="docutils literal notranslate"><span class="pre">Trainer</span></code> — no adapter or processor
+subclass is needed. The model should accept <code class="docutils literal notranslate"><span class="pre">input_values</span></code> (raw waveforms) and return
+a <code class="docutils literal notranslate"><span class="pre">SequenceClassifierOutput</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">nnAudio2.features.mel</span><span class="w"> </span><span class="kn">import</span> <span class="n">MelSpectrogram</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trainer</span><span class="p">,</span> <span class="n">TrainingArguments</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers.modeling_outputs</span><span class="w"> </span><span class="kn">import</span> <span class="n">SequenceClassifierOutput</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">AudioClassifier</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_classes</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="c1"># Trainable mel filterbank — optimised end-to-end with the rest of the model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mel</span>  <span class="o">=</span> <span class="n">MelSpectrogram</span><span class="p">(</span><span class="n">sr</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span> <span class="n">n_mels</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">trainable_mel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">n_classes</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_values</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">spec</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mel</span><span class="p">(</span><span class="n">input_values</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>   <span class="c1"># [B, 64]</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="n">loss</span>   <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span> <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">SequenceClassifierOutput</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span> <span class="n">logits</span><span class="o">=</span><span class="n">logits</span><span class="p">)</span>
+
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">AudioClassifier</span><span class="p">(</span><span class="mi">35</span><span class="p">),</span>
+    <span class="n">args</span><span class="o">=</span><span class="n">TrainingArguments</span><span class="p">(</span><span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">,</span> <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
+    <span class="n">train_dataset</span><span class="o">=...</span><span class="p">,</span>   <span class="c1"># yields {&quot;input_values&quot;: waveform, &quot;labels&quot;: label}</span>
+<span class="p">)</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Gradients flow back through the mel filterbank at every step. For stable training of
+the filterbank, use a parameter group with a lower learning rate for <code class="docutils literal notranslate"><span class="pre">model.mel</span></code>
+(e.g. 5 % of the CNN learning rate) and clamp <code class="docutils literal notranslate"><span class="pre">mel_basis</span></code> to non-negative values
+after each step. A complete example with these guard rails is in <strong>Tutorial 5</strong>.</p>
+</section>
 <section id="using-gpu">
 <h2>Using GPU<a class="headerlink" href="#using-gpu" title="Link to this heading"></a></h2>
 <p>All transforms support <code class="docutils literal notranslate"><span class="pre">.to(device)</span></code> exactly like any other PyTorch module.</p>
@@ -294,6 +333,7 @@ parameters once training is complete, for offline reconstruction.</p></li>
 <li><p><strong>Part 2</strong> — training a linear keyword spotter with trainable basis functions</p></li>
 <li><p><strong>Part 3</strong> — evaluating the model and visualising learned kernels</p></li>
 <li><p><strong>Part 4</strong> — replacing the linear classifier with a BC-ResNet</p></li>
+<li><p><strong>Part 5</strong> — speed benchmarks, HuggingFace <code class="docutils literal notranslate"><span class="pre">Trainer</span></code> integration, and learnable mel filterbanks (+28 % accuracy on Speech Commands)</p></li>
 </ul>
 <p>The figure below shows the STFT basis before and after training.</p>
 <img alt="STFT basis before and after training" class="align-center" src="_images/Trained_basis.png" />
