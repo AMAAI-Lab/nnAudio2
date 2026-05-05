@@ -1,6 +1,6 @@
 # nnAudio2
 
-**nnAudio2** is an audio feature extraction toolbox for deep learning, built on PyTorch. Spectrograms and other audio transforms are implemented as `nn.Module` layers — they run on-device (CUDA, MPS, or CPU), are fully differentiable, and can be embedded directly inside a neural network. Filter banks (Mel, CQT, STFT kernels) can optionally be made **trainable**.
+**nnAudio2** is an audio feature extraction toolbox for deep learning, built on PyTorch. Spectrograms and other audio transforms are implemented as `nn.Module` layers — they run on-device (CUDA, MPS, or CPU), are fully differentiable, and can be embedded directly inside a neural network. Filter banks (Mel, CQT, STFT kernels) can optionally be made **trainable**. Models that use nnAudio2 transforms are compatible with the [HuggingFace `Trainer`](https://huggingface.co/docs/transformers/main_classes/trainer) out of the box — no wrapper needed.
 
 nnAudio2 is developed and maintained by the [AMAAI Lab](https://amaai-lab.github.io/) at SUTD. It is a modernised successor to [nnAudio](https://github.com/AMAAI-Lab/nnAudio), which is no longer actively maintained. The original nnAudio codebase has been fully overhauled to work with modern PyTorch and the current scientific Python ecosystem.
 
@@ -72,6 +72,46 @@ mel = mel.to('cuda')   # or 'mps' on Apple Silicon
 audio = torch.randn(4, 22050).to('cuda')   # batch of 4 × 1-second clips
 spec  = mel(audio)                          # [4, 128, T] — on GPU
 ```
+
+**HuggingFace Trainer integration** — any model that puts an nnAudio2 transform in its `forward()` works directly with `Trainer`. Raw waveforms go in; the spectrogram is computed on-device during the forward pass:
+
+```python
+import torch.nn as nn
+from nnAudio2.features.mel import MelSpectrogram
+from transformers import Trainer, TrainingArguments
+from transformers.modeling_outputs import SequenceClassifierOutput
+
+class AudioClassifier(nn.Module):
+    def __init__(self, n_classes):
+        super().__init__()
+        self.mel = MelSpectrogram(sr=16000, n_mels=64, trainable_mel=True)
+        self.head = nn.Linear(64, n_classes)
+
+    def forward(self, input_values, labels=None):
+        spec = self.mel(input_values).mean(-1)   # [B, 64]
+        logits = self.head(spec)
+        loss = F.cross_entropy(logits, labels) if labels is not None else None
+        return SequenceClassifierOutput(loss=loss, logits=logits)
+
+trainer = Trainer(model=AudioClassifier(35), args=TrainingArguments(...), ...)
+trainer.train()   # gradients flow back through the mel filterbank
+```
+
+See [Tutorial 5](tutorials/) for a full benchmark and end-to-end example on Speech Commands.
+
+---
+
+## Tutorials
+
+Step-by-step Jupyter notebooks are in the [`tutorials/`](tutorials/) folder.
+
+| Notebook | Topic |
+|---|---|
+| Part 1 | Loading audio and computing Mel spectrograms |
+| Part 2 | Training a keyword spotter with trainable basis functions |
+| Part 3 | Evaluation and filterbank visualisation |
+| Part 4 | Non-linear models with a nnAudio2 front-end |
+| **Part 5** | **Speed benchmarks, HuggingFace Trainer integration, and learnable mel filterbanks** — shows a +28% accuracy gain on Speech Commands from `trainable_mel=True` |
 
 ---
 

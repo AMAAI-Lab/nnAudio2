@@ -22,6 +22,12 @@ Each tutorial is a self-contained Jupyter notebook that can be run locally.
    * - **Part 4**
      - *Using more complex non-linear models* — swapping the linear classifier for a
        BC-ResNet while keeping the nnAudio2 front-end unchanged.
+   * - **Part 5**
+     - *Fast & differentiable audio features with HuggingFace* — benchmarking librosa,
+       torchaudio, and nnAudio2 on MPS/GPU; integrating ``MelSpectrogram`` as the first
+       layer of a HuggingFace ``Trainer``-compatible model; enabling ``trainable_mel=True``
+       and visualising filterbank adaptation. Demonstrates a **+28 % relative accuracy
+       improvement** on Google Speech Commands v0.02 (35-class) over a fixed mel baseline.
 
 To run the tutorials, install the dependencies listed in ``tutorials/requirements.txt``
 and open the notebooks in Jupyter:
