@@ -1,4 +1,7 @@
 # nnAudio2
+[![IEEE Access](https://img.shields.io/badge/📄%20IEEE%20Access-Original%20Paper-blue)](https://ieeexplore.ieee.org/document/9174990)
+
+[![arXiv](https://img.shields.io/badge/📝%20arXiv-2606.05394-b31b1b)](https://arxiv.org/abs/2606.05394)
 
 **nnAudio2** is an audio feature extraction toolbox for deep learning, built on PyTorch. Spectrograms and other audio transforms are implemented as `nn.Module` layers — they run on-device (CUDA, MPS, or CPU), are fully differentiable, and can be embedded directly inside a neural network. Filter banks (Mel, CQT, STFT kernels) can optionally be made **trainable**. Models that use nnAudio2 transforms are compatible with the [HuggingFace `Trainer`](https://huggingface.co/docs/transformers/main_classes/trainer) out of the box — no wrapper needed.
 
@@ -130,6 +133,7 @@ Full changelog: [CHANGELOG.md](CHANGELOG.md)
 
 If you use nnAudio2, please cite **both** papers.
 
+
 ### nnAudio2 (this repository)
 
 > Abhinaba Roy, Junyi Liang, Dorien Herremans. (2026). *nnAudio 2: Overcoming Dynamic Compilation Barriers and Transform Inconsistencies.* arXiv (forthcoming).
@@ -138,7 +142,7 @@ If you use nnAudio2, please cite **both** papers.
 @article{roy2026nnaudio2,
   author  = {Roy, Abhinaba and Liang, Junyi and Herremans, Dorien},
   title   = {nnAudio 2: Overcoming Dynamic Compilation Barriers and Transform Inconsistencies},
-  journal = {arXiv},
+  journal = {arXiv:2606.05394},
   year    = {2026},
 }
 ```
