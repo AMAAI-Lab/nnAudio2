@@ -134,7 +134,7 @@ If you use nnAudio2, please cite **both** papers.
 
 ### nnAudio2 (this repository)
 
-> Abhinaba Roy, Junyi Liang, Dorien Herremans. (2026). *nnAudio 2: Overcoming Dynamic Compilation Barriers and Transform Inconsistencies.* arXiv (forthcoming).
+> Abhinaba Roy, Junyi Liang, Dorien Herremans. (2026). *nnAudio 2: Overcoming Dynamic Compilation Barriers and Transform Inconsistencies.* arXiv. [Read paper](https://arxiv.org/abs/2606.05394).
 
 ```bibtex
 @article{roy2026nnaudio2,
@@ -178,10 +178,8 @@ pytest
 
 A GitHub Actions workflow at `.github/workflows/publish-to-pypi.yml` publishes the package when a version tag is pushed.
 
-1. Create a `pypi` environment in the GitHub repository settings and require manual approval.
-2. In PyPI, add a Trusted Publisher for `AMAAI-Lab / nnAudio2`, workflow `publish-to-pypi.yml`, environment `pypi`.
-3. Bump `__version__` in `Installation/nnAudio2/__init__.py` to match the tag.
-4. Push the tag: `git tag v2.0.2 && git push origin v2.0.2`.
+1. Bump `__version__` in `Installation/nnAudio2/__init__.py` to match the tag.
+2. Push the tag: `git tag v2.0.3 && git push origin v2.0.3`.
 
 ---
 
