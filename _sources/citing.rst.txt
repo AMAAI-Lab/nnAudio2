@@ -12,7 +12,6 @@ Plain text
 
 Abhinaba Roy, Junyi Liang, Dorien Herremans. (2026).
 *nnAudio 2: Overcoming Dynamic Compilation Barriers and Transform Inconsistencies.*
-arXiv (forthcoming).
 
 BibTeX
 ~~~~~~
@@ -22,7 +21,7 @@ BibTeX
     @article{roy2026nnaudio2,
       author  = {Roy, Abhinaba and Liang, Junyi and Herremans, Dorien},
       title   = {nnAudio 2: Overcoming Dynamic Compilation Barriers and Transform Inconsistencies},
-      journal = {arXiv},
+      journal = {arXiv:2606.05394},
       year    = {2026},
     }
 
