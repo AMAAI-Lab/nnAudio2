@@ -1,9 +1,9 @@
 import os
 
-__version__ = "2.0.2"
+__version__ = "2.0.3"
 
 __citation__ = (
-    'Roy et al. (2026) nnAudio 2, arXiv. '
+    'Roy et al. (2026) nnAudio 2: Overcoming Dynamic Compilation Barriers and Transform Inconsistencies, arXiv:2606.05394. '
     'Cheuk et al. (2020) nnAudio, IEEE Access, doi:10.1109/ACCESS.2020.3019084.'
 )
 
