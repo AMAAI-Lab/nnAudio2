@@ -134,13 +134,14 @@ If you use nnAudio2, please cite **both** papers.
 
 ### nnAudio2 (this repository)
 
-> Abhinaba Roy, Junyi Liang, Dorien Herremans. (2026). *nnAudio 2: Overcoming Dynamic Compilation Barriers and Transform Inconsistencies.* arXiv. [Read paper](https://arxiv.org/abs/2606.05394).
+> Abhinaba Roy, Junyi Liang, Dorien Herremans. (2026). *nnAudio 2: Overcoming Dynamic Compilation Barriers and Transform Inconsistencies.* Proc. of 7th Conference on AI Music Creativity (AIMC). [Read paper](https://arxiv.org/abs/2606.05394).
 
 ```bibtex
-@article{roy2026nnaudio2,
+@inproceedings{roy2026nnaudio2,
   author  = {Roy, Abhinaba and Liang, Junyi and Herremans, Dorien},
   title   = {nnAudio 2: Overcoming Dynamic Compilation Barriers and Transform Inconsistencies},
-  journal = {arXiv:2606.05394},
+  booktitle = {Proc. of 7th Conference on AI Music Creativity (AIMC)},
+  address = {Berlin, Germany},
   year    = {2026},
 }
 ```
