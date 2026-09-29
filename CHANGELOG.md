@@ -1,5 +1,12 @@
 # Changelog
 
+## version 2.0.3
+
+- **NumPy 2 support** (issue [#2](../../issues/2)): removed the `numpy<2` upper bound from the package metadata. The library code already worked with NumPy 2; the cap was a leftover in `setup.py` that contradicted the 2.0.0 baseline. The minimum is now `numpy>=1.21`. Note that NumPy 2 requires PyTorch 2.3 or newer.
+- **CI**: added jobs that run the test suite with both `numpy<2` and `numpy>=2`; older PyTorch jobs are pinned to `numpy<2`.
+
+---
+
 ## version 2.0.2 (May 2026)
 
 - **Inverse CQT (`iCQT`)**: new `nn.Module` that reconstructs a waveform from the `'Complex'` output of `CQT1992v2` using iterative Landweber inversion. The upper frame bound is estimated via power iteration at initialisation; the step size is set to `1.8/B` for guaranteed convergence. The adjoint correctly handles `ReflectionPad1d` boundary folding to match the forward operator exactly. Reconstruction SNR exceeds 30 dB for signals within the Nyquist-sampled frequency range of the chosen `hop_length` (see documentation for the constraint). The module is fully differentiable.

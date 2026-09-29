@@ -38,6 +38,16 @@ jobs:
               torch-version: '1.12.0'
             - python-version: '3.10'
               torch-version: '2.1.0'
+        include:
+          # torch < 2.3 was built against NumPy 1.x, so the legacy jobs above
+          # run with numpy<2. These two jobs cover both NumPy generations
+          # with a torch release that supports NumPy 2.
+          - python-version: '3.11'
+            torch-version: '2.5.1'
+            numpy-spec: 'numpy<2'
+          - python-version: '3.11'
+            torch-version: '2.5.1'
+            numpy-spec: 'numpy>=2'
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
@@ -49,8 +59,9 @@ jobs:
         run: |
           sudo apt-get install libsndfile1-dev
           python -m pip install --upgrade pip
-          pip install torch==${{matrix.torch-version}}
+          pip install torch==${{matrix.torch-version}} "${{ matrix.numpy-spec || 'numpy<2' }}"
           pip install -e "Installation[tests]"
+          python -c "import numpy; print('numpy', numpy.__version__)"
       - name: Test with pytest
         run: |
           pytest Installation/tests
