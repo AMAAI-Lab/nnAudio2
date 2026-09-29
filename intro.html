@@ -163,7 +163,7 @@ The input shape is <code class="docutils literal notranslate"><span class="pre">
 <span class="kn">import</span><span class="w"> </span><span class="nn">torchaudio</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">nnAudio2.features.mel</span><span class="w"> </span><span class="kn">import</span> <span class="n">MelSpectrogram</span>
 
-<span class="n">waveform</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;audio.wav&#39;</span><span class="p">)</span>      <span class="c1"># [channels, samples]</span>
+<span class="n">waveform</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">'audio.wav'</span><span class="p">)</span>      <span class="c1"># [channels, samples]</span>
 <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>         <span class="c1"># mono, [1, samples]</span>
 
 <span class="n">mel</span> <span class="o">=</span> <span class="n">MelSpectrogram</span><span class="p">(</span><span class="n">sr</span><span class="o">=</span><span class="n">sr</span><span class="p">,</span> <span class="n">n_fft</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">n_mels</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
@@ -173,8 +173,8 @@ The input shape is <code class="docutils literal notranslate"><span class="pre">
 <p>For an STFT:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">nnAudio2.features.stft</span><span class="w"> </span><span class="kn">import</span> <span class="n">STFT</span>
 
-<span class="n">stft</span> <span class="o">=</span> <span class="n">STFT</span><span class="p">(</span><span class="n">n_fft</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">freq_scale</span><span class="o">=</span><span class="s1">&#39;no&#39;</span><span class="p">,</span> <span class="n">sr</span><span class="o">=</span><span class="mi">22050</span><span class="p">,</span>
-            <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;Magnitude&#39;</span><span class="p">)</span>
+<span class="n">stft</span> <span class="o">=</span> <span class="n">STFT</span><span class="p">(</span><span class="n">n_fft</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">freq_scale</span><span class="o">=</span><span class="s1">'no'</span><span class="p">,</span> <span class="n">sr</span><span class="o">=</span><span class="mi">22050</span><span class="p">,</span>
+            <span class="n">output_format</span><span class="o">=</span><span class="s1">'Magnitude'</span><span class="p">)</span>
 <span class="n">spec</span> <span class="o">=</span> <span class="n">stft</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -202,8 +202,8 @@ you call <code class="docutils literal notranslate"><span class="pre">model.to(d
         <span class="n">spec</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-10</span><span class="p">)</span>  <span class="c1"># [B, n_mels, T]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">classifier</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
 
-<span class="n">model</span> <span class="o">=</span> <span class="n">KeywordSpotter</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span>
-<span class="n">audio</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">16000</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">KeywordSpotter</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'cuda'</span><span class="p">)</span>
+<span class="n">audio</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">16000</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'cuda'</span><span class="p">)</span>
 <span class="n">logits</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">audio</span><span class="p">)</span>                           <span class="c1"># [8, 12]</span>
 </pre></div>
 </div>
@@ -237,8 +237,8 @@ a <code class="docutils literal notranslate"><span class="pre">SequenceClassifie
 
 <span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span>
     <span class="n">model</span><span class="o">=</span><span class="n">AudioClassifier</span><span class="p">(</span><span class="mi">35</span><span class="p">),</span>
-    <span class="n">args</span><span class="o">=</span><span class="n">TrainingArguments</span><span class="p">(</span><span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;./out&quot;</span><span class="p">,</span> <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
-    <span class="n">train_dataset</span><span class="o">=...</span><span class="p">,</span>   <span class="c1"># yields {&quot;input_values&quot;: waveform, &quot;labels&quot;: label}</span>
+    <span class="n">args</span><span class="o">=</span><span class="n">TrainingArguments</span><span class="p">(</span><span class="n">output_dir</span><span class="o">=</span><span class="s2">"./out"</span><span class="p">,</span> <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
+    <span class="n">train_dataset</span><span class="o">=...</span><span class="p">,</span>   <span class="c1"># yields {"input_values": waveform, "labels": label}</span>
 <span class="p">)</span>
 <span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
 </pre></div>
@@ -251,7 +251,7 @@ after each step. A complete example with these guard rails is in <strong>Tutoria
 <section id="using-gpu">
 <h2>Using GPU<a class="headerlink" href="#using-gpu" title="Link to this heading"></a></h2>
 <p>All transforms support <code class="docutils literal notranslate"><span class="pre">.to(device)</span></code> exactly like any other PyTorch module.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mel</span> <span class="o">=</span> <span class="n">MelSpectrogram</span><span class="p">(</span><span class="n">sr</span><span class="o">=</span><span class="mi">22050</span><span class="p">,</span> <span class="n">n_fft</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">n_mels</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mel</span> <span class="o">=</span> <span class="n">MelSpectrogram</span><span class="p">(</span><span class="n">sr</span><span class="o">=</span><span class="mi">22050</span><span class="p">,</span> <span class="n">n_fft</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">n_mels</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'cuda'</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>On Apple Silicon, use <code class="docutils literal notranslate"><span class="pre">device='mps'</span></code> instead.</p>
@@ -286,7 +286,7 @@ Wideband signals (e.g. a full-range chirp) with a large <code class="docutils li
 SNR because high-frequency bins are Nyquist-undersampled in time.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">nnAudio2.features.cqt</span><span class="w"> </span><span class="kn">import</span> <span class="n">CQT1992v2</span><span class="p">,</span> <span class="n">iCQT</span>
 
-<span class="n">cqt</span>  <span class="o">=</span> <span class="n">CQT1992v2</span><span class="p">(</span><span class="n">sr</span><span class="o">=</span><span class="mi">22050</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;Complex&#39;</span><span class="p">)</span>
+<span class="n">cqt</span>  <span class="o">=</span> <span class="n">CQT1992v2</span><span class="p">(</span><span class="n">sr</span><span class="o">=</span><span class="mi">22050</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s1">'Complex'</span><span class="p">)</span>
 <span class="n">icqt</span> <span class="o">=</span> <span class="n">iCQT</span><span class="p">(</span><span class="n">sr</span><span class="o">=</span><span class="mi">22050</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
 
 <span class="n">X</span>           <span class="o">=</span> <span class="n">cqt</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>                        <span class="c1"># [B, n_bins, T, 2]</span>
@@ -305,7 +305,7 @@ CQT-based autoencoder:</p>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">CQT1992v2</span><span class="p">(</span><span class="n">sr</span><span class="o">=</span><span class="mi">22050</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
-                                 <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;Complex&#39;</span><span class="p">)</span>
+                                 <span class="n">output_format</span><span class="o">=</span><span class="s1">'Complex'</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bottleneck</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># example</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">iCQT</span><span class="p">(</span><span class="n">sr</span><span class="o">=</span><span class="mi">22050</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
 
