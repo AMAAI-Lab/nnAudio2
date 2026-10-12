@@ -539,6 +539,7 @@ class iSTFT(STFTBase):
             verbose=False,
         )
         window_mask = get_window(window, int(win_length), fftbins=True)
+        window_mask = pad_center(window_mask, n_fft)
 
         # For inverse, the Fourier kernels do not need to be windowed
         window_mask = torch.tensor(window_mask).unsqueeze(0).unsqueeze(-1)
