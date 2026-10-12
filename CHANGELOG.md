@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Fixed non-finite waveform gradients at silent magnitude bins when STFT kernels are not trainable.
+
 ## version 2.0.3
 
 - **NumPy 2 support** (issue [#2](../../issues/2)): removed the `numpy<2` upper bound from the package metadata. The library code already worked with NumPy 2; the cap was a leftover in `setup.py` that contradicted the 2.0.0 baseline. The minimum is now `numpy>=1.21`. Note that NumPy 2 requires PyTorch 2.3 or newer.

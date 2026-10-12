@@ -346,7 +346,7 @@ class STFT(STFTBase):
                     spec + 1e-8
                 )  # prevent Nan gradient when sqrt(0) due to output=0
             else:
-                return torch.sqrt(spec)
+                return torch.norm(torch.stack((spec_real, spec_imag), dim=-1), dim=-1)
 
         elif output_format == "Complex":
             return torch.stack(
